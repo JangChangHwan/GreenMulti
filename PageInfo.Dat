@@ -1,5 +1,44 @@
+
 top	넓은마을 초기화면		guide|mail|bbs|computer|potion|blindnews|magazin|pds
 guide	1. 공지 및 이용안내	top	notice|oldinfo|rtguide
 notice	1. 공지사항	guide	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=notice&mo=guide&&gonum=&s_que=
 oldinfo	2. 지난공지	guide	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=oldinfo&mo=guide&&gonum=&s_que=
 rtguide	3. 마을이용안내	guide	http://web.kbuwel.or.kr/menu/index.php?mo=guide&club=main&bcode=rtguide&page=1
+mail	2. 전자 우편	top	rmail|wmail|confirm
+rmail	1. 받은편지함	mail	http://web.kbuwel.or.kr/menu/mail.php?page=1&cmd=list&&box=1
+wmail	2. 메일 쓰기	mail	http://web.kbuwel.or.kr/menu/mail.php?cmd=write&&box=1
+confirm	3. 보낸편지확인	mail	http://web.kbuwel.or.kr/menu/mail.php?page=1&cmd=list&&box=3
+
+bbs	3. 게시판	top	free|freeinfo|mark|story|news|agora|humor|ff|broadcast|kbu4|stress1|comma|dvsbbs|cardbbs|relibbs|prevbbs
+free	1. 자유게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free&mo=bbs&&gonum=&s_que=
+freeinfo	2. 자유공지 / 광고	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=freeinfo&mo=bbs&&gonum=&s_que=
+mark	3. 벼룩시장 / 구인, 구직	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=mark&mo=bbs&&gonum=&s_que=
+story	4. 이야기 벤치	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=story&mo=bbs&&gonum=&s_que=
+news	5. 뉴스 광장	bbs	news1|news2|news3|news4|news5|news6|news7|news8|news9|welbbs|allnews
+news1	1. 속보	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news1&mo=news&&gonum=&s_que=
+news2	2. 정치	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news2&mo=news&&gonum=&s_que=
+news3	3. 경제	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news3&mo=news&&gonum=&s_que=
+news4	4. 사회	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news4&mo=news&&gonum=&s_que=
+news5	5. 생활 / 문화	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news5&mo=news&&gonum=&s_que=
+news6	6. 세계	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news6&mo=news&&gonum=&s_que=
+news7	7. I T / 과학	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news7&mo=news&&gonum=&s_que=
+news8	8. 연예	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news8&mo=news&&gonum=&s_que=
+news9	9. 스포츠	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news9&mo=news&&gonum=&s_que=
+welbbs	10. 복지통신	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=welbbs&mo=news&&gonum=&s_que=
+allnews	12. 전체뉴스 보기	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=allnews&mo=news&&gonum=&s_que=
+agora	6. 아고라 토론	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=agora&mo=bbs&&gonum=&s_que=
+humor	7. 유머 / 공포 / 황당	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=humor&mo=bbs&&gonum=&s_que=
+ff	8. 가입인사 / 초보 연습	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=ff&mo=bbs&&gonum=&s_que=
+broadcast	9. 화면해설방송 게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=broadcast&mo=bbs&&gonum=&s_que=
+kbu4	10. 녹음도서목록	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=kbu4&mo=bbs&&gonum=&s_que=
+stress1	12. 속상한 것 털어 놓는 방	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=stress1&mo=bbs&&gonum=&s_que=
+comma	13. 쉼표가 찍힌 일상	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=comma&mo=bbs&&gonum=&s_que=
+dvsbbs	14. 화면해설방송수신기 불편 신고 게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&mo=bbs&club=main&bcode=dvsbbs
+cardbbs	15. 의약품 부작용 불편 신고 게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&mo=bbs&club=main&bcode=cardbbs
+relibbs	16. 종교게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=relibbs&mo=bbs&&gonum=&s_que=
+prevbbs	17. 이전 자유게시판	bbs	free2014|free2011|free2006|free2003
+free2014	1. 2014년 이전 자유게시판	prevbbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free2014&mo=freebbs&&gonum=&s_que=
+free2011	2. 2011년 이전 자유게시판	prevbbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free2011&mo=freebbs&&gonum=&s_que=
+free2006	3. 2007년 이전 자유게시판	prevbbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free2006&mo=freebbs&&gonum=&s_que=
+free2003	4. 2004년 이전 자유게시판	prevbbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free2003&mo=freebbs&&gonum=&s_que=
+

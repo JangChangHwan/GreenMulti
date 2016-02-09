@@ -13,6 +13,7 @@ def TreeMenuFromFile():
 
 	ptn = re.compile(r"(.+)([\r\n]+)$")
 	for s in l:
+		if not s or not "\t" in s: continue
 		s = ptn.sub(r"\1", s)
 		kv = s.split("\t")
 		d[kv[0]] = (kv[1], kv[2], kv[3])

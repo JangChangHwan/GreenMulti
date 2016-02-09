@@ -43,7 +43,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		elif e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT:
 			parent = self.dTreeMenu[self.bcode][1]
 			if not parent: return
-			title, parent, href = self.dTreeMenu[parent]
+			title, temp, href = self.dTreeMenu[parent]
 			self.GetInfo((parent, title, "", href))
 			self.DisplayItems(0)
 
