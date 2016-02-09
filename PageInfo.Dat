@@ -1,0 +1,5 @@
+top	넓은마을 초기화면		guide|mail|bbs|computer|potion|blindnews|magazin|pds
+guide	1. 공지 및 이용안내	top	notice|oldinfo|rtguide
+notice	1. 공지사항	guide	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=notice&mo=guide&&gonum=&s_que=
+oldinfo	2. 지난공지	guide	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=oldinfo&mo=guide&&gonum=&s_que=
+rtguide	3. 마을이용안내	guide	http://web.kbuwel.or.kr/menu/index.php?mo=guide&club=main&bcode=rtguide&page=1
