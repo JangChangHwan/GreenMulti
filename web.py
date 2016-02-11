@@ -7,14 +7,17 @@ import MultipartPostHandler
 import urllib, urllib2, cookielib
 
 
-class WebProcess():
+class WebProcess(Utility):
 	def __init__(self):
-		self.dTreeMenu = TreeMenuFromFile()
+		self.dTreeMenu = self.TreeMenuFromFile()
 		self.bcode = "top"
 		self.lItemList = [("top", "제목", "", self.dTreeMenu["top"][2])]
 		self.GetInfo(self.lItemList[0])
 
+# 웹탐색 관련
+		self.soup = ""
 		self.opener = self.BuildOpener()
+
 
 	def GetInfo(self, t):
 		if "cmd=view" in t[3]:
@@ -26,7 +29,6 @@ class WebProcess():
 
 
 	def GetMenu(self, t): # t는 lItemList의 원소 형식
-		print(t[0])
 		self.lItemList = []
 		for c in t[3].split("|"):
 			if not c in self.dTreeMenu: continue
@@ -39,10 +41,12 @@ class WebProcess():
 		pass
 
 	def Get(self, url):
-		pass
+		res = self.opener.open(url)
+		self.soup = bs(res.read(), "html.parser")
 
 	def Post(self, url, d): 
-		pass
+		res = self.opener.open(url, d)
+		self.soup = bs(res.read(), "html.parser")
 
 	def BuildOpener(self):
 		cj = cookielib.CookieJar()
