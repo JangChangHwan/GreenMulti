@@ -25,13 +25,32 @@ class GreenMulti(wx.Frame, WebProcess):
 		self.listctrl.Bind(wx.EVT_KEY_DOWN, self.listctrl_KeyDown)
 #		self.listctrl.Bind(wx.EVT_RIGHT_DOWN, self.on_listctrl1_right_down)
 
+# 게시물 읽기 편집창
+		lbl_textctrl1 = wx.StaticText(panel, -1, u'본문 영역', (510, 5), (500, 20))
+		self.textctrl1 = wx.TextCtrl(panel, wx.ID_ANY, '', (510, 30), (500, 170), wx.TE_MULTILINE | wx.TE_READONLY)
+#		self.textctrl1.Bind(wx.EVT_KEY_DOWN, self.on_textctrl1_key_down)
+#		self.textctrl1.Bind(wx.EVT_RIGHT_DOWN, self.on_textctrl1_right_down)
+
+		lbl_textctrl2 = wx.StaticText(panel, -1, u'댓글 영역', (510, 205), (500, 20))
+		self.textctrl2 = wx.TextCtrl(panel, wx.ID_ANY, '', (510, 230), (500, 150), wx.TE_MULTILINE | wx.TE_READONLY)
+#		self.textctrl2.Bind(wx.EVT_KEY_DOWN, self.on_textctrl2_key_down)
+
+		lbl_textctrl3 = wx.StaticText(panel, -1, u'댓글입력', (510, 385), (100, 20))
+		self.textctrl3 = wx.TextCtrl(panel, wx.ID_ANY, '', (615, 385), (290, 20), wx.TE_MULTILINE)
+#		self.textctrl3.Bind(wx.EVT_KEY_DOWN, self.on_textctrl3_key_down)
+
+		self.btn_reple_save = wx.Button(panel, -1, u'댓글저장', (910, 385), (100, 20))
+#		self.btn_reple_save.Bind(wx.EVT_BUTTON, self.on_reple_save)
+#		self.btn_reple_save.Bind(wx.EVT_KEY_DOWN, self.on_reple_key_down)
+#		self.Bind(wx.EVT_CLOSE, self.on_close)
+
 		self.Show()
 		self.KbuLogin()
-		self.DisplayItems(0)
+		self.DisplayItems("menu")
 
 
 	def KbuLogin(self):
-#		try:
+		try:
 			kbuid = self.Decrypt(self.ReadReg('kbuid'))
 			if not kbuid: kbuid = self.InputBox(u'넓은마을 로그인', u'아이디')
 			kbupw = self.Decrypt(self.ReadReg('kbupw'))
@@ -48,25 +67,31 @@ class GreenMulti(wx.Frame, WebProcess):
 				self.WriteReg('kbuid', '')
 				self.WriteReg('kbupw', '')
 				return self.MsgBox(u'알림', u'초록등대 회원인증에 실패했습니다.')
-#		except:
-#			pass
+		except:
+			pass
 
 
-	def DisplayItems(self, n):
-		if n < 0: return
-		self.listctrl.DeleteAllItems()
-		for t in self.lItemList:
-			index = self.listctrl.InsertItem(sys.maxint, t[1])
-			self.listctrl.SetItem(index, 1, t[2])
-
+	def DisplayItems(self, mode):
+		if mode == "menu" or mode == "list":
+			self.listctrl.DeleteAllItems()
+			for t in self.lItemList:
+				index = self.listctrl.InsertItem(sys.maxint, t[1])
+				self.listctrl.SetItem(index, 1, t[2])
+		elif mode == "view":
+			self.textctrl1.SetValue(self.ViewInfo["content"])
+			self.textctrl2.SetValue(self.ViewInfo["replies"])
+			self.textctrl3.Clear()
 
 	def listctrl_KeyDown(self, e):
 		k = e.GetKeyCode()
+
 		if k == wx.WXK_RETURN:
 			n = self.listctrl.GetFocusedItem()
-			self.GetInfo(self.lItemList[n])
-			self.DisplayItems(n)
-			self.Play("page_next.wav")
+			r = self.GetInfo(self.lItemList[n])
+			if r: 
+				self.DisplayItems(r)
+				self.Play("page_next.wav")
+				if r == "view": self.textctrl1.SetFocus()
 
 		elif (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT) or k == wx.WXK_ESCAPE:
 			parent = self.dTreeMenu[self.bcode][1]
@@ -74,10 +99,34 @@ class GreenMulti(wx.Frame, WebProcess):
 				self.Play("beep.wav")
 				return
 
+			self.ListInfo.clear()
+			self.ViewInfo.clear()
+			self.textctrl1.Clear()
+			self.textctrl2.Clear()
+			self.textctrl3.Clear()
+
 			title, temp, href = self.dTreeMenu[parent]
-			self.GetInfo((parent, title, "", href))
-			self.DisplayItems(0)
-			self.Play("back.wav")
+			r = self.GetInfo((parent, title, "", href))
+			if r:
+				self.DisplayItems("menu")
+				self.Play("back.wav")
+
+		elif k == wx.WXK_PAGEDOWN:
+			r = self.PageMove(True)
+			if r and len(self.lItemList) > 0:
+				self.DisplayItems("list")
+				self.Play("page_next.wav")
+			else:
+				r = self.PageMove(False)
+				self.Play("beep.wav")
+
+		elif k == wx.WXK_PAGEUP:
+			r = self.PageMove(False)
+			if r:
+				self.DisplayItems("list")
+				self.Play("page_prev.wav")
+			else:
+				self.Play("beep.wav")
 
 		else:
 			e.Skip()

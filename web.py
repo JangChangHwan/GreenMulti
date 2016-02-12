@@ -5,6 +5,7 @@ from util import *
 from bs4  import BeautifulSoup as bs
 import MultipartPostHandler
 import urllib, urllib2, cookielib
+import re
 
 
 class WebProcess(Utility):
@@ -15,17 +16,23 @@ class WebProcess(Utility):
 		self.GetInfo(self.lItemList[0])
 
 # 웹탐색 관련
-		self.soup = ""
+		self.ListInfo = {}
+		self.ViewInfo = {}
+		self.soup = None
+		self.html = ""
+		self.response = None
 		self.opener = self.BuildOpener()
 
 
 	def GetInfo(self, t):
 		if "cmd=view" in t[3]:
-			self.GetView(t)
-		elif "http" in t[3]:
-			self.GetList(t)
+			r = self.GetView(t)
+		elif not ("bcode=" in t[3]):
+			r = self.GetMenu(t)
 		else:
-			self.GetMenu(t)
+			r = self.GetList(t)
+
+		return r
 
 
 	def GetMenu(self, t): # t는 lItemList의 원소 형식
@@ -35,21 +42,122 @@ class WebProcess(Utility):
 			l = self.dTreeMenu[c]
 			self.lItemList.append((c, unicode(l[0], "euc-kr", "ignore"), "", l[2]))
 		self.bcode = t[0]
+		return "menu" if l[0] else False
 
 
-	def GetView(self, s):
-		pass
+	def GetList(self, t):
+# 게시물 목록 뽑아내기 / 게시판 코드가 있으면 bcode에 넣고 없으면 패스
+		self.lItemList = []
+		self.ListInfo.clear()
+		self.ListInfo["host"] = re.sub(r"(?ims)^(http.?://[^/]+)(/.+)", r"\1", t[3])
+		self.Get(t[3])
+		self.ListInfo["url"] = self.response.url
+		links = self.soup("a", href=re.compile(r"(?ims)cmd=view"))
+		if links is None: return
+		for l in links:
+			href = ""
+			title = ""
+			author = ""
+# 링크 주소를 href에 저장
+			try:
+						href = self.ListInfo["host"] + l["href"]
+			except:
+				pass
+# 제목을 title에 저장
+			try:
+				title = l.get_text()
+			except:
+				pass
+# 작성자를 author에 저장
+			try:
+				author = l.parent.next_sibling.next_sibling.get_text()
+			except:
+				pass
+			if not author and (title == u"이용약관" or title == u"개인정보취급방침"): continue
+			self.lItemList.append(("", title, author, href))
+		if t[0]: self.bcode = t[0]
+# 글쓰기 버튼 추출
+		wlink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=write'))
+		if wlink is not None: self.ListInfo['write_url'] = self.ListInfo['host'] + wlink['href']
+		return "list" if href else False
+
+
+	def GetView(self, t):
+		self.ViewInfo.clear()
+		self.Get(t[3])
+		self.ViewInfo["url"] = self.ListInfo["host"] + self.response.url
+
+		tables = self.soup('table')
+
+# 본문
+		try:
+			title = tables[2].get_text()
+			self.ViewInfo["content"] = '\r\n' + tables[2].get_text() + '\r\n' + tables[3].get_text()  
+		except:
+			pass
+
+# 첨부파일
+		dFiles = {}
+		files = self.soup(name='a', href=re.compile(r'(?i)cmd=download'))
+		for f in files:
+			try:
+				dFiles[f.img['alt']] = self.ListInfo['host'] + f['href']
+			except:
+				pass
+		self.ViewInfo["files"] = dFiles
+
+# 댓글
+		try:
+			self.ViewInfo['replies'] = ''
+			if tables[6].td.get_text() == u'☞ 댓글':
+				trs = tables[7].find_all('tr')
+				for tr in trs:
+					try:
+						self.ViewInfo["replies"] += '\r\n[' + tr.td.get_text() + ']\r\n' + tr.td.next_sibling.next_sibling.get_text() + '\r\n' 
+						if tr.td.next_sibling.next_sibling.next_sibling.next_sibling.a is not None: self.ViewInfo["replies"] += tr.td.next_sibling.next_sibling.next_sibling.next_sibling.a['title'] 
+					except:
+						pass
+		except:
+			pass
+
+# 글쓰기 주소 추출
+		wlink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=write'))
+		if wlink is not None: self.ViewInfo['write_url'] = self.ListInfo['host'] + wlink['href']
+# 수정버튼 찾기'
+		elink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=edit'))
+		if elink is not None: self.ViewInfo['edit_url'] = self.ListInfo['host'] + elink['href']
+# 삭제버튼
+		dellink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=delete'))
+		if elink is not None: self.ViewInfo['delete_url'] = self.ListInfo['host'] + dellink['href']
+		return "view" if self.ViewInfo["content"] else False
+
 
 	def Get(self, url):
-		res = self.opener.open(url)
-		self.soup = bs(res.read(), "html.parser")
+		self.response = self.opener.open(url)
+		self.html = unicode(self.response.read(), "euc-kr", "ignore")
+		self.soup = bs(self.html, "html.parser")
 
 	def Post(self, url, d): 
-		res = self.opener.open(url, d)
-		self.soup = bs(res.read(), "html.parser")
+		self.response = self.opener.open(url, d)
+		self.html = unicode(self.response.read(), "euc-kr", "ignore")
+		self.soup = bs(self.html, "html.parser")
 
 	def BuildOpener(self):
 		cj = cookielib.CookieJar()
 		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj), MultipartPostHandler.MultipartPostHandler)
 		urllib2.install_opener(opener)
 		return opener
+
+	def PageMove(self, down=True):
+		base_url, d = self.ParamSplit(self.ListInfo["url"])
+		# page 키가 없거나 값 없다면 page를 1로 설정
+		if not ("page" in d) or not d["page"]: d["page"] = "1"
+		if down == False and d["page"] <= "1": return False
+		n = int(d["page"]) + 1 if down else int(d["page"]) - 1
+		d["page"] = str(n)
+		n_url = base_url + "?" + self.ParamJoin(d, False)
+		title, p, href = self.dTreeMenu[self.bcode]
+		self.GetInfo((self.bcode, title, "", n_url))
+		return "list"
+
+

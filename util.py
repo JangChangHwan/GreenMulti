@@ -6,12 +6,13 @@ import re
 import winsound
 import os
 import _winreg
+import urllib
 
 
 class Utility():
 	def __init__(self):
 		self.key = "%x" % os.path.getctime(os.environ["APPDATA"])
-		print self.key
+
 	def TreeMenuFromFile(self):
 		""" PageInfo.Dat 파일로부터 목록상자에 표시될 트리메뉴를 만듭니다. 반환값 : 사전 객체"""
 		d = {} # 반환될 내요을 담을 사전
@@ -85,3 +86,23 @@ os.path.dirname(sys.argv[0]) + "\\sound\\" + wavfile, winsound.SND_ASYNC)
 			return r
 		except:
 			return ''
+
+	def ParamSplit(self, url):
+# url 주소 문자열을 유니코드로 바꾸고 base_url 문자열과 매개변수가 담긴 사전으로 반환한다.
+		d = {}
+		base_url, params = url.split("?")
+		for kvp in params.split("&"):
+			if not kvp or not ("=" in kvp): continue
+			k, v = kvp.split("=")
+			if not k: continue
+			d[k] = v
+		return (base_url, d)
+
+	def ParamJoin(self, d, enc = True):
+# 다시 url로 조립 물론 urlencode를  사용할지를 선택
+		if enc: 
+			params = urllib.urlencode(d)
+		else:
+			params = "&".join([u"%s=%s" % (k, v) for k, v in d.items()])
+		return params
+
