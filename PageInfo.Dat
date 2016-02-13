@@ -61,7 +61,7 @@ comlecetcb	2. 문서 강좌 / 메뉴얼	comlec	http://web.kbuwel.or.kr/menu/index.php?p
 
 prg	5. 개발자와 함께	computer	hims|xvsrd
 
-hims	1. 자원 메디칼(구 힘스인터내셔널)	prg	himsinfo|himsintro|himsproduc|himsfree|himsqna|himsqna2|himsfaq|himsstudy1|
+hims	1. 자원 메디칼(구 힘스인터내셔널)	prg	himsinfo|himsintro|himsproduc|himsfree|himsqna|himsqna2|himsfaq|himsstudy1|himspds1
 himsinfo	1. 공지사항	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsinfo&mo=hims&&gonum=&s_que=
 himsintro	2. 회사소개	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsintro&mo=hims&&gonum=&s_que=
 himsproduc	3. 제품소개	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsproduc&mo=hims&&gonum=&s_que=

@@ -103,6 +103,6 @@ os.path.dirname(sys.argv[0]) + "\\sound\\" + wavfile, winsound.SND_ASYNC)
 		if enc: 
 			params = urllib.urlencode(d)
 		else:
-			params = "&".join([u"%s=%s" % (k, v) for k, v in d.items()])
+			params = "&".join(["%s=%s" % (k, v) for k, v in d.items()])
 		return params
 
