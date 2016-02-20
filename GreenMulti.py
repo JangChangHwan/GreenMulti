@@ -2,11 +2,13 @@
 # 메인 프로그램
 
 import sys
-import wx
 from util import *
 from web import *
 import winsound
 import os
+import wx
+from bs4 import BeautifulSoup as bs
+from multiprocessing import Process, Queue
 
 
 class GreenMulti(wx.Frame, WebProcess):
@@ -14,6 +16,8 @@ class GreenMulti(wx.Frame, WebProcess):
 		WebProcess.__init__(self)
 		Utility.__init__(self)
 		wx.Frame.__init__(self, None, -1, title)
+
+		self.ResQ = Queue()
 		self.Size = wx.Size(1015, 410)
 		panel = wx.Panel(self, -1)
 		panel.SetAutoLayout(True)
@@ -40,7 +44,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		self.textctrl3.Bind(wx.EVT_KEY_DOWN, self.OnTextCtrl3KeyDown)
 
 		self.btn_reple_save = wx.Button(panel, -1, u'댓글저장', (910, 385), (100, 20))
-#		self.btn_reple_save.Bind(wx.EVT_BUTTON, self.on_reple_save)
+		self.btn_reple_save.Bind(wx.EVT_BUTTON, self.OnSaveReplies)
 		self.btn_reple_save.Bind(wx.EVT_KEY_DOWN, self.OnRepleKeyDown)
 #		self.Bind(wx.EVT_CLOSE, self.on_close)
 
@@ -81,6 +85,7 @@ class GreenMulti(wx.Frame, WebProcess):
 			self.textctrl1.SetValue(self.ViewInfo["content"])
 			self.textctrl2.SetValue(self.ViewInfo["replies"])
 			self.textctrl3.Clear()
+
 
 	def listctrl_KeyDown(self, e):
 		k = e.GetKeyCode()
@@ -128,6 +133,19 @@ class GreenMulti(wx.Frame, WebProcess):
 			else:
 				self.Play("beep.wav")
 
+		elif k == ord("W") or k == ord("w"):
+			self.WriteArticle()
+
+		elif k == wx.WXK_DELETE:
+			n = self.listctrl.GetFocusedItem()
+			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
+			res = self.opener.open(self.lItemList[n][3])
+			html = unicode(res.read(), "euc-kr", "ignore")
+			soup = bs(html, "html.parser")
+			deltag = soup.find("a", href=re.compile(r"(?ims)cmd=delete"))
+			if deltag is None: return
+			if not self.DeleteArticle(self.ListInfo["host"] + deltag["href"]): return
+
 		else:
 			e.Skip()
 
@@ -139,10 +157,19 @@ class GreenMulti(wx.Frame, WebProcess):
 		entry.Destroy()
 
 
-	def MsgBox(self, title, text):
-		d = wx.MessageDialog(self, text, title, wx.OK)
-		d.ShowModal()
-		d.Destroy()
+	def MsgBox(self, title, text, question=False):
+		if question:
+			d = wx.MessageDialog(self, text, title, wx.OK | wx.CANCEL)
+			if d.ShowModal() == wx.ID_OK:
+				return True
+			else:
+				return False
+			d.Destroy()
+
+		else:
+			d = wx.MessageDialog(self, text, title, wx.OK)
+			d.ShowModal()
+			d.Destroy()
 
 
 	def OnTextCtrl1KeyDown(self, e):
@@ -175,6 +202,26 @@ class GreenMulti(wx.Frame, WebProcess):
 			if p == -1: return winsound.Beep(1000, 100)
 			self.textctrl2.SetInsertionPoint(p)
 
+		elif k == wx.WXK_RETURN:
+#			try:
+				n = self.textctrl2.GetInsertionPoint()
+				b, x, y = self.textctrl2.PositionToXY(n)
+				l = self.textctrl2.GetLineText(y)
+				m = re.match(u'^\\d+ 번 리플삭제', l)
+				if not l or m is None: return
+				d = wx.MessageDialog(self, l[:-4] + u'댓글을 정말로 삭제할까요?', u'댓글 삭제', wx.OK | wx.CANCEL)
+				if d.ShowModal() == wx.ID_OK:
+					url = self.ViewInfo["url"]
+					href = self.ListInfo['host'] + '/menu/index.php' + self.soup.find(name='a', title=m.group())['href']
+					self.GetInfo(("", "", "", href))
+					self.ViewInfo["url"] = url
+					self.textctrl2.Clear()
+					self.DisplayItems("view")
+					self.textctrl2.SetFocus()
+					self.Play("delete.wav")
+#			except:
+#				pass
+
 		else:
 			e.Skip()
 
@@ -193,6 +240,51 @@ class GreenMulti(wx.Frame, WebProcess):
 			self.Play("back.wav")
 		else:
 			e.Skip()
+
+
+	def OnSaveReplies(self, e):
+#		try:
+			ccmemo = self.textctrl3.GetValue()
+			if not ccmemo: return
+			ccmemo = ccmemo.replace('"', r'\"')
+			ccmemo = ccmemo.replace("'", r"\'")
+			if not self.SaveReplies(ccmemo): return
+			self.DisplayItems("view")
+			self.textctrl2.SetFocus()
+			self.Play("replies.wav")
+
+#		except:
+#			pass
+
+	def WriteArticle(self):
+		if not ("write_url" in self.ListInfo) or not self.ListInfo["write_url"]: return
+		res = self.opener.open(self.ListInfo["write_url"])
+		html = res.read()
+		soup = bs(unicode(html, "euc-kr", "ignore"), "html.parser")
+		wd = WriteDialog(self, u"게시물 쓰기", soup)
+		if wd.ShowModal() == wx.ID_OK:
+			action = wd.action
+			title = wd.textctrl1.GetValue()
+			body = wd.textctrl2.GetValue()
+			file = wd.attach
+			wd.Destroy()
+			if not title or not body: return self.MsgBox(u"오류", u"게시물 제목과 본문 내용은 필수 입력사항입니다. 게시물을 올릴 수 없습니다.")
+			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.ResQ))
+			p.start()
+		else:
+			wd.Destroy()
+
+	def DeleteArticle(self, url):
+		list_url = self.ListInfo["url"]
+		if not self.MsgBox(u"삭제 경고", u"정말로 게시물을 삭제할까요?", True): return
+		self.Get(url)
+		self.GetInfo((self.bcode, "", "", list_url))
+		self.DisplayItems("list")
+		self.textctrl1.Clear()
+		self.textctrl2.Clear()
+		self.textctrl3.Clear()
+		self.listctrl.SetFocus()
+
 
 
 if __name__ == "__main__":

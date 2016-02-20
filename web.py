@@ -6,7 +6,10 @@ from bs4  import BeautifulSoup as bs
 import MultipartPostHandler
 import urllib, urllib2, cookielib
 import re
-
+from multiprocessing import Process, Queue
+import os
+import sys
+import winsound
 
 class WebProcess(Utility):
 	def __init__(self):
@@ -79,13 +82,14 @@ class WebProcess(Utility):
 # 글쓰기 버튼 추출
 		wlink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=write'))
 		if wlink is not None: self.ListInfo['write_url'] = self.ListInfo['host'] + wlink['href']
+		self.ViewInfo = {}
 		return "list" if href else False
 
 
 	def GetView(self, t):
 		self.ViewInfo.clear()
 		self.Get(t[3])
-		self.ViewInfo["url"] = self.ListInfo["host"] + self.response.url
+		self.ViewInfo["url"] = self.response.url
 
 		tables = self.soup('table')
 
@@ -120,15 +124,21 @@ class WebProcess(Utility):
 		except:
 			pass
 
-# 글쓰기 주소 추출
-		wlink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=write'))
-		if wlink is not None: self.ViewInfo['write_url'] = self.ListInfo['host'] + wlink['href']
 # 수정버튼 찾기'
 		elink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=edit'))
 		if elink is not None: self.ViewInfo['edit_url'] = self.ListInfo['host'] + elink['href']
 # 삭제버튼
 		dellink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=delete'))
 		if elink is not None: self.ViewInfo['delete_url'] = self.ListInfo['host'] + dellink['href']
+
+# 댓글 관련 태그들
+		self.ViewInfo["data"] = {}
+		hiddens = self.soup(name='input', type='hidden')
+		for h in hiddens:
+			self.ViewInfo["data"][h['name']] = h['value']
+		self.ViewInfo["data"]["ccname"] = self.soup.find(name='input', type='text')['value'].encode('euc-kr', 'ignore')
+		form = self.soup.find(name='form', action=re.compile(r'(?i)/menu/'))
+		self.ViewInfo['action'] = self.ListInfo['host'] + form['action']
 		return "view" if self.ViewInfo["content"] else False
 
 
@@ -136,6 +146,7 @@ class WebProcess(Utility):
 		self.response = self.opener.open(url)
 		self.html = unicode(self.response.read(), "euc-kr", "ignore")
 		self.soup = bs(self.html, "html.parser")
+
 
 	def Post(self, url, d): 
 		self.response = self.opener.open(url, d)
@@ -160,4 +171,54 @@ class WebProcess(Utility):
 		self.GetInfo((self.bcode, title, "", n_url))
 		return "list"
 
+
+	def SaveReplies(self, memo):
+		if not memo: return False
+		self.ViewInfo["data"]["ccmemo"] = memo.encode('euc-kr', 'ignore')
+		self.Post(self.ViewInfo["action"], self.ViewInfo["data"])
+		self.GetInfo(("", "", "", self.ViewInfo["url"]))
+		return True
+
+
+class Upload(Process, WebProcess):
+	def __init__(self, action, title, body, file, q):
+		Process.__init__(self)
+		Utility.__init__(self)
+		WebProcess.__init__(self)
+
+		if not action or not title or not body: return
+		self.action = action.encode("euc-kr", "ignore")
+		self.title = title.encode("euc-kr", "ignore")
+		self.body = body.encode("euc-kr", "ignore")
+		self.q = q
+		if file and os.path.exists(file): 
+			self.file = file.encode("euc-kr", "ignore")
+		else:
+			self.file = False
+
+		if not self.KbuLogin(): return
+		self.run()
+
+	def KbuLogin(self):
+#		try:
+			kbuid = self.Decrypt(self.ReadReg('kbuid'))
+			kbupw = self.Decrypt(self.ReadReg('kbupw'))
+			params = {"ret":"notice_top", "ret2":"", "cmd":"check_login", "log_id":kbuid, "log_passwd":kbupw}
+			self.Post('http://web.kbuwel.or.kr/menu/login.php', params)
+			if not("login=true" in self.soup.get_text()): return False
+			return True
+#		except:
+#			return False
+
+	def run(self):
+		host, data = self.ParamSplit(self.action)
+		data[u"제목".encode("euc-kr", "ignore")] = self.title
+		data["tbody"] = self.body
+		if self.file: data["up_file1"] = open(self.file, "rb")
+		self.q.put((self.file, u"업로드 중...", 0))
+		self.Post(host, data)
+		self.q.put((self.file, u"업로드 완료", 100))
+		for i in range(12):
+			winsound.Beep(500+i*50, 100)
+		sys.exit()
 

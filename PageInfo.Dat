@@ -4,8 +4,15 @@ green	0. 초록등대	top	green1|green2|green3|green4|green5|green6|green7|green8|gr
 green1	1. 공지사항	green	http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green1
 green2	2. 나눔장터	green	http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green2
 green3	3. 우리들의 이야기	green	http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green3
-green4	4. 자료실	green	green41|green42|green43|green44|green45|green46|green47
 
+green4	4. 자료실	green	green41|green42|green43|green44|green45|green46|green47
+green41	1. 운영체제 / 드라이버	green	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green41
+green42	2. 일반 자료실	green	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green42
+green43	3. 포터블 자료실	green	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green43
+green44	4. 멀티미디어 / 인터넷	green	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green44
+green45	5. 프로그램 자동설치	green	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green45
+green46	6. 강의실	green	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green46
+green47	7. 기타자료실	green	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green47
 
 guide	1. 공지 및 이용안내	top	notice|oldinfo|rtguide
 notice	1. 공지사항	guide	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=notice&mo=guide&&gonum=&s_que=
