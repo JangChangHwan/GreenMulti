@@ -10,6 +10,8 @@ from multiprocessing import Process, Queue
 import os
 import sys
 import winsound
+import time
+
 
 class WebProcess(Utility):
 	def __init__(self):
@@ -95,8 +97,11 @@ class WebProcess(Utility):
 
 # 본문
 		try:
+			print "step1"
 			title = tables[2].get_text()
+			print "step2"
 			self.ViewInfo["content"] = '\r\n' + tables[2].get_text() + '\r\n' + tables[3].get_text()  
+			print "step3"
 		except:
 			pass
 
@@ -131,14 +136,17 @@ class WebProcess(Utility):
 		dellink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=delete'))
 		if elink is not None: self.ViewInfo['delete_url'] = self.ListInfo['host'] + dellink['href']
 
-# 댓글 관련 태그들
+# 댓글 입력 관련 태그들
 		self.ViewInfo["data"] = {}
-		hiddens = self.soup(name='input', type='hidden')
-		for h in hiddens:
-			self.ViewInfo["data"][h['name']] = h['value']
-		self.ViewInfo["data"]["ccname"] = self.soup.find(name='input', type='text')['value'].encode('euc-kr', 'ignore')
-		form = self.soup.find(name='form', action=re.compile(r'(?i)/menu/'))
-		self.ViewInfo['action'] = self.ListInfo['host'] + form['action']
+		self.ViewInfo["action"] = ""
+		form = self.soup.find(name='form', attrs={"name":"comment"})
+		if form is not None:
+			self.ViewInfo['action'] = self.ListInfo['host'] + form['action']
+			self.ViewInfo["data"]["ccname"] = self.soup.find(name='input', attrs={"name":"ccname"})['value'].encode('euc-kr', 'ignore')
+			hiddens = self.soup(name='input', type='hidden')
+			for h in hiddens:
+				self.ViewInfo["data"][h['name']] = h['value']
+
 		return "view" if self.ViewInfo["content"] else False
 
 
@@ -182,22 +190,23 @@ class WebProcess(Utility):
 
 class Upload(Process, WebProcess):
 	def __init__(self, action, title, body, file, q):
-		Process.__init__(self)
-		Utility.__init__(self)
-		WebProcess.__init__(self)
-
-		if not action or not title or not body: return
-		self.action = action.encode("euc-kr", "ignore")
-		self.title = title.encode("euc-kr", "ignore")
-		self.body = body.encode("euc-kr", "ignore")
-		self.q = q
-		if file and os.path.exists(file): 
-			self.file = file.encode("euc-kr", "ignore")
-		else:
-			self.file = False
-
-		if not self.KbuLogin(): return
-		self.run()
+		try:
+			Process.__init__(self)
+			Utility.__init__(self)
+			WebProcess.__init__(self)
+			if not action or not title or not body: return
+			self.action = action.encode("euc-kr", "ignore")
+			self.title = title.encode("euc-kr", "ignore")
+			self.body = body.encode("euc-kr", "ignore")
+			self.q = q
+			if file and os.path.exists(file): 
+				self.file = file.encode("euc-kr", "ignore")
+			else:
+				self.file = False
+			if not self.KbuLogin(): return
+			self.run()
+		except:
+			self.Play("error.wav", async=False)
 
 	def KbuLogin(self):
 #		try:
@@ -215,10 +224,68 @@ class Upload(Process, WebProcess):
 		data[u"제목".encode("euc-kr", "ignore")] = self.title
 		data["tbody"] = self.body
 		if self.file: data["up_file1"] = open(self.file, "rb")
-		self.q.put((self.file, u"업로드 중...", 0))
+		self.q.put((0, u"업로드 중", self.file, 0, 0))
 		self.Post(host, data)
-		self.q.put((self.file, u"업로드 완료", 100))
-		for i in range(12):
-			winsound.Beep(500+i*50, 100)
-		sys.exit()
+		self.q.put((100, u"업로드 완료", self.file, 0, 0))
+		self.Play("up.wav", async=False)
+
+
+
+class Download(Process, WebProcess):
+	def __init__(self, f, u, q):
+		Process.__init__(self)
+		Utility.__init__(self)
+		WebProcess.__init__(self)
+
+		self.Play("down_start.wav")
+		self.q = q
+		self.filename = f
+		self.url = u
+		self.downfolder = self.ReadReg("downfolder")
+		if not self.downfolder: self.downfolder = "C:\\"
+		if not self.KbuLogin(): return
+		self.run()
+
+	def KbuLogin(self):
+		try:
+			kbuid = self.Decrypt(self.ReadReg('kbuid'))
+			kbupw = self.Decrypt(self.ReadReg('kbupw'))
+			params = {"ret":"notice_top", "ret2":"", "cmd":"check_login", "log_id":kbuid, "log_passwd":kbupw}
+			self.Post('http://web.kbuwel.or.kr/menu/login.php', params)
+			if not("login=true" in self.soup.get_text()): return False
+			return True
+		except:
+			self.Play("error.wav", async=False)
+			return False
+
+
+	def run(self):
+		res = self.opener.open(self.url)
+		meta = res.info()
+		file_size = int(meta.getheaders("Content-Length")[0])
+		down_size = 0
+		block_size = 1024 * 1024
+		start_time = time.time()
+		filepath = self.downfolder + "\\" + self.filename
+		filepath = filepath.replace("\\\\", "\\")
+# 로컬디스크에서 파일 크기를 보고 크기가 같으면 다운로드 종료
+		if not os.path.exists(filepath) or os.path.getsize(filepath) != file_size:
+			fp = open(filepath, "wb")
+			self.q.put((0, u"다운로드 중", self.filename, 0, 0)) # (up/down, filename, speed, remain)
+			while True:
+				buffer = res.read(block_size)
+				if not buffer: break
+				down_size += len(buffer)
+				fp.write(buffer)
+				per = down_size * 100.0 / file_size
+				t = time.time() - start_time
+				speed = down_size / t / 1024 / 1024
+				remain = t * file_size / down_size
+				self.q.put((per, u"다운로드 중", self.filename, speed, remain))
+# 다운완료라면
+			fp.close()
+			self.q.put((100.0, u"다운로드 완료", self.filename, 0, 0))
+
+		self.Play("down.wav", async=False)
+
 

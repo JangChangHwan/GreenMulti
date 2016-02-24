@@ -9,7 +9,11 @@ import os
 import wx
 from bs4 import BeautifulSoup as bs
 from multiprocessing import Process, Queue
+from threading import Thread
+import time
+import subprocess
 
+#if time.time() > 1458751826: sys.exit()
 
 class GreenMulti(wx.Frame, WebProcess):
 	def __init__(self, title):
@@ -18,7 +22,40 @@ class GreenMulti(wx.Frame, WebProcess):
 		wx.Frame.__init__(self, None, -1, title)
 
 		self.ResQ = Queue()
+		self.dProcess = {}
+		self.dTransInfo = {}
+		self.msg = ""
+# Queue 관리자를 실행
+		self.th = Thread(target=QueueManager, args=(self,))
+		self.th.start()
+
 		self.Size = wx.Size(1015, 410)
+
+		menubar = wx.MenuBar()
+		file_menu = wx.Menu()
+		help_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"도움말\tF1")
+		file_menu.Append(help_mi)
+		self.Bind(wx.EVT_MENU, self.OnHelp, help_mi)
+		home_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"홈으로 이동\tAlt+Home")
+		file_menu.Append(home_mi)
+		self.Bind(wx.EVT_MENU, self.OnComeBackHome, home_mi)
+		status_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"파일 전송 정보\tCtrl+J")
+		file_menu.Append(status_mi)
+		self.Bind(wx.EVT_MENU, self.OnTransferStatus, status_mi)
+		opendir_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"다운로드 폴더 열기\tCtrl+O")
+		file_menu.Append(opendir_mi)
+		self.Bind(wx.EVT_MENU, self.OnOpenDownFolder, opendir_mi)
+		chdir_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"다운로드 폴더 변경")
+		file_menu.Append(chdir_mi)
+		self.Bind(wx.EVT_MENU, self.OnChangeDownFolder, chdir_mi)
+		quit_mi = wx.MenuItem(file_menu, wx.ID_ANY, '종료(&X)\tAlt+F4)')
+		file_menu.Append(quit_mi)
+		self.Bind(wx.EVT_MENU, self.OnClose, quit_mi)
+
+		menubar.Append(file_menu, '넓은마을(&K)')
+		self.SetMenuBar(menubar)
+
+
 		panel = wx.Panel(self, -1)
 		panel.SetAutoLayout(True)
 
@@ -46,11 +83,25 @@ class GreenMulti(wx.Frame, WebProcess):
 		self.btn_reple_save = wx.Button(panel, -1, u'댓글저장', (910, 385), (100, 20))
 		self.btn_reple_save.Bind(wx.EVT_BUTTON, self.OnSaveReplies)
 		self.btn_reple_save.Bind(wx.EVT_KEY_DOWN, self.OnRepleKeyDown)
-#		self.Bind(wx.EVT_CLOSE, self.on_close)
+		self.Bind(wx.EVT_CLOSE, self.OnClose)
 
 		self.Show()
 		self.KbuLogin()
 		self.DisplayItems("menu")
+
+
+	def OnClose(self, e):
+		self.Play("end.wav")
+		self.msg = "exit"
+		time.sleep(0.5)
+		self.th.join()
+		if self.dProcess:
+			for k, v in self.dProcess.items():
+				try:
+					v.terminate()
+				except:
+					pass
+		self.Destroy()
 
 
 	def KbuLogin(self):
@@ -66,7 +117,7 @@ class GreenMulti(wx.Frame, WebProcess):
 			if "login=true" in self.soup.get_text():
 				self.WriteReg('kbuid', self.Encrypt(kbuid))
 				self.WriteReg('kbupw', self.Encrypt(kbupw))
-				self.Play("program_start.wav")
+				self.Play("start.wav")
 			else:
 				self.WriteReg('kbuid', '')
 				self.WriteReg('kbupw', '')
@@ -98,7 +149,7 @@ class GreenMulti(wx.Frame, WebProcess):
 				self.Play("page_next.wav")
 				if r == "view": self.textctrl1.SetFocus()
 
-		elif (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT) or k == wx.WXK_ESCAPE:
+		elif (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT) or k == wx.WXK_ESCAPE or k == 8:
 			parent = self.dTreeMenu[self.bcode][1]
 			if not parent: 
 				self.Play("beep.wav")
@@ -144,7 +195,35 @@ class GreenMulti(wx.Frame, WebProcess):
 			soup = bs(html, "html.parser")
 			deltag = soup.find("a", href=re.compile(r"(?ims)cmd=delete"))
 			if deltag is None: return
-			if not self.DeleteArticle(self.ListInfo["host"] + deltag["href"]): return
+			self.DeleteArticle(self.ListInfo["host"] + deltag["href"])
+
+		elif k == ord("E") or k == ord("e"):
+			n = self.listctrl.GetFocusedItem()
+			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
+			res = self.opener.open(self.lItemList[n][3])
+			html = unicode(res.read(), "euc-kr", "ignore")
+			soup = bs(html, "html.parser")
+			edittag = soup.find("a", href=re.compile(r"(?ims)cmd=edit"))
+			if edittag is None: return
+			self.EditArticle(self.ListInfo["host"] + edittag["href"])
+
+		elif k == ord("D") or k == ord("d"):
+			n = self.listctrl.GetFocusedItem()
+			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
+			res = self.opener.open(self.lItemList[n][3])
+			html = unicode(res.read(), "euc-kr", "ignore")
+			soup = bs(html, "html.parser")
+			files = soup("a", href=re.compile(r"(?ims)cmd=download"))
+			if files is None: return
+			dFiles = {}
+			for f in files:
+				dFiles[f.img['alt']] = self.ListInfo['host'] + f['href']
+			self.Download(dFiles)
+
+		elif k == wx.WXK_F5:
+			self.GetInfo(("", "", "", self.ListInfo["url"]))
+			self.DisplayItems("list")
+			self.Play("refresh.wav")
 
 		else:
 			e.Skip()
@@ -174,9 +253,32 @@ class GreenMulti(wx.Frame, WebProcess):
 
 	def OnTextCtrl1KeyDown(self, e):
 		k = e.GetKeyCode()
-		if k == wx.WXK_ESCAPE or (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT):
+
+		if k == wx.WXK_ESCAPE or (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT) or k == 8:
 			self.listctrl.SetFocus()
 			self.Play("back.wav")
+
+		elif k == wx.WXK_F5:
+			self.GetInfo(("", "", "", self.ViewInfo["url"]))
+			self.DisplayItems("view")
+			self.textctrl1.SetFocus()
+			self.Play("refresh.wav")
+
+		elif k == ord("W") or k == ord("w"):
+			self.WriteArticle()
+
+		elif k == wx.WXK_DELETE:
+			if not ("delete_url" in self.ViewInfo) or not self.ViewInfo["delete_url"]: return
+			self.DeleteArticle(self.ViewInfo["delete_url"])
+
+		elif k == ord("E") or k == ord("e"):
+			if not ("edit_url" in self.ViewInfo) or not self.ViewInfo["edit_url"]: return
+			self.EditArticle(self.ViewInfo["edit_url"])
+
+		elif k == ord("D") or k == ord("d"):
+			if not ("files" in self.ViewInfo) or not self.ViewInfo["files"]: return
+			self.Download(self.ViewInfo["files"])
+
 		else:
 			e.Skip()
 
@@ -252,9 +354,8 @@ class GreenMulti(wx.Frame, WebProcess):
 			self.DisplayItems("view")
 			self.textctrl2.SetFocus()
 			self.Play("replies.wav")
-
 #		except:
-#			pass
+#			self.Play("error.wav")
 
 	def WriteArticle(self):
 		if not ("write_url" in self.ListInfo) or not self.ListInfo["write_url"]: return
@@ -271,6 +372,26 @@ class GreenMulti(wx.Frame, WebProcess):
 			if not title or not body: return self.MsgBox(u"오류", u"게시물 제목과 본문 내용은 필수 입력사항입니다. 게시물을 올릴 수 없습니다.")
 			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.ResQ))
 			p.start()
+			if file: self.dProcess[file] = p
+
+		else:
+			wd.Destroy()
+
+	def EditArticle(self, url):
+		res = self.opener.open(url)
+		html = res.read()
+		soup = bs(unicode(html, "euc-kr", "ignore"), "html.parser")
+		wd = WriteDialog(self, u"게시물 수정하기", soup)
+		if wd.ShowModal() == wx.ID_OK:
+			action = wd.action
+			title = wd.textctrl1.GetValue()
+			body = wd.textctrl2.GetValue()
+			file = wd.attach
+			wd.Destroy()
+			if not title or not body: return self.MsgBox(u"오류", u"게시물 제목과 본문 내용은 필수 입력사항입니다. 게시물을 올릴 수 없습니다.")
+			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.ResQ))
+			p.start()
+			if file: self.dProcess[file] = p
 		else:
 			wd.Destroy()
 
@@ -285,6 +406,63 @@ class GreenMulti(wx.Frame, WebProcess):
 		self.textctrl3.Clear()
 		self.listctrl.SetFocus()
 
+
+	def Download(self, d):
+		if not d: return 
+		for f, u in d.items():
+			p = Process(target=Download, args=(f, u, self.ResQ))
+			p.start()
+			self.dProcess[f] = p
+			
+
+	def OnTransferStatus(self, e):
+		ts = TransferStatus(self)
+		ts.ShowModal()
+		ts.Destroy()
+
+
+	def OnChangeDownFolder(self, e):
+		try:
+			fd = wx.DirDialog(self, '다운로드 폴더 변경', "")
+			if fd.ShowModal() == wx.ID_OK:
+				self.WriteReg('downfolder', fd.GetPath())
+				self.MsgBox(u"결과", u"다운로드 폴더를 변경했습니다.\n" + self.ReadReg("downfolder"))
+				fd.Destroy()
+		except:
+			pass
+
+	def OnOpenDownFolder(self, e):
+		subprocess.Popen		("explorer.exe " + self.ReadReg("downfolder"))
+
+
+	def OnComeBackHome(self, e):
+		self.GetInfo(("top", "", "", self.dTreeMenu["top"][2]))
+		self.DisplayItems("menu")
+		self.listctrl.SetFocus()
+		self.Play("back.wav")
+
+	def OnHelp(self, e):
+		msg = """초록멀티 1.5 맛보기 버전
+제작자 : 장창환
+단축키 안내
+게시판 진입 : Enter
+될돌아 나오기 : Escape도 되고, BackSpace도 되고, Alt + LeftArrow 중 아무 것나 사용하세요.
+컨트롤 간의 이동: Tab 
+홈으로 이동 : Alt + Home
+다음 페이지 : Page Down
+이전 페이지 Page Up
+게시물 쓰기 : 영문 W
+게시물 수정하기 : 영문 E
+게시물 삭제하기 : Delete
+다운로드하기 : 영문 D
+파일 전송 정보 보기 : Control + 영문 J
+파일 정보 보기 대화상자에서의 단축키
+정보 새로고침 : Space 혹은 Enter
+전송 취소 : Delete
+다운로드 폴더 열기: Control + 영문 O
+* 주의 : 이 프로그램은 3월 22일까지 정상동작합니다."""
+
+		self.MsgBox(u"도움말", msg)
 
 
 if __name__ == "__main__":

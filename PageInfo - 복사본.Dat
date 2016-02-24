@@ -1,3 +1,18 @@
+top	넓은마을 초기화면		green|guide|mail|bbs|computer|potion|blindnews|magazin|pds
+
+green	0. 초록등대	top	green1|green2|green3|green4|green5|green6|green7|green8|green9|green99
+green1	1. 공지사항	green	http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green1
+green2	2. 나눔장터	green	http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green2
+green3	3. 우리들의 이야기	green	http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green3
+
+green4	4. 자료실	green	green41|green42|green43|green44|green45|green46|green47
+green41	1. 운영체제 / 드라이버	green4	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green41
+green42	2. 일반 자료실	green4	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green42
+green43	3. 포터블 자료실	green4	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green43
+green44	4. 멀티미디어 / 인터넷	green4	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green44
+green45	5. 프로그램 자동설치	green4	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green45
+green46	6. 강의실	green4	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green46
+green47	7. 기타자료실	green4	http://web.kbuwel.or.kr/menu/index.php?mo=green4&club=green&bcode=green47
 
 guide	1. 공지 및 이용안내	top	notice|oldinfo|rtguide
 notice	1. 공지사항	guide	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=notice&mo=guide&&gonum=&s_que=
@@ -96,41 +111,6 @@ blaze	12. 책마루 2 OCR	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&cl
 himsetc	13. 기타자료	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsetc&mo=himspds1&&gonum=&s_que=
 himsuser	14. 사용자 자료실	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsuser&mo=himspds1&&gonum=&s_que=
 himspost	15. 제품 사용 수기	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himspost&mo=himspds1&&gonum=&s_que=
-
-
-xvsrd	2. Sense Reader 엑스비전	prg	xvinfo|xvfree|xvgame|xvqna|xvqna1|xvmsrd|xvfaq|xvtutor|xvpds|xvhope
-xvinfo	1. 공지사항	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvinfo
-xvfree	2. 자유게시판	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvfree
-xvgame	3. 게임게시판	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvgame
-xvqna	4. Sense Reader 묻고답하기	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvqna
-xvqna1	5. 브레일노트 묻고답하기	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvqna1
-xvmsrd	6. 모바일센스 묻고답하기	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvmsrd
-xvfaq	7. 자주 묻는 질문과 답변	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvfaq
-
-xvtutor	8. 강의실	xvsrd	xvtutor1|xvtutor2|xvtutor3|xvtutor4|xvtutor8|xvtutor5|xvtutor6|xvtutor11|xvtutor9|xvtutor10|7|xvtutorall
-xvtutor1	1. 운영체제	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor1
-xvtutor2	2. 응용프로그램	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor2
-xvtutor3	3. 통신및인터넷	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor3
-xvtutor4	4. power edition office	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor4
-xvtutor8	5. professional office	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor8
-xvtutor5	6. SenseReader기본강좌	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor5
-xvtutor6	7. SenseReader활용팁	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor6
-xvtutor11	8. 센스월드 강의실	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor11
-xvtutor9	9. 게임 강의실	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor9
-xvtutor10	10. 모바일 센스 강의실	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor10
-xvtutor7	11. BrailleNote 강의	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor7
-xvtutorall	12. 전체자료실	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutorall
-
-xvpds	9. 자료실	xvsrd	xvpds1|xvpds2|xvpds3|xvpds4|xvpds5|xvpds6|xvpdsall
-xvpds1	1. SenseReader자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds1
-xvpds2	2. 일반자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds2
-xvpds3	3. BrailleNote 관련 자료	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds3
-xvpds4	4. 게임 자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds4
-xvpds5	5. 게임사용자 자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds5
-xvpds6	6. 모바일센스자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds6
-xvpdsall	7. 전체자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpdsall
-xvhope	10. Xvision Technology에게 바란다	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvhope
-
 
 skt	6. SK 행복을 들려주는 도서관	computer	skt1|skt2|skt3|skt4
 skt1	1. 공지사항	skt	http://web.kbuwel.or.kr/menu/index.php?page=1&club=skt&bcode=skt1&mo=skt&&gonum=&s_que=
