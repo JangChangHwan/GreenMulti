@@ -58,7 +58,7 @@ class WebProcess(Utility):
 		self.Get(t[3])
 		self.ListInfo["url"] = self.response.url
 		links = self.soup("a", href=re.compile(r"(?ims)cmd=view"))
-		if links is None: return
+		if links is None: return False
 		for l in links:
 			href = ""
 			title = ""
@@ -84,6 +84,11 @@ class WebProcess(Utility):
 # 글쓰기 버튼 추출
 		wlink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=write'))
 		if wlink is not None: self.ListInfo['write_url'] = self.ListInfo['host'] + wlink['href']
+# 게시물 검색 action 주소를 ListInfo["find_action"]에 저장
+		self.ListInfo["find_action"] = ""
+		find = self.soup.find("form", attrs={"name":"form_search"})
+		if find is not None: self.ListInfo["find_action"] = self.ListInfo["host"] + find["action"]
+
 		self.ViewInfo = {}
 		return "list" if href else False
 
@@ -96,12 +101,10 @@ class WebProcess(Utility):
 		tables = self.soup('table')
 
 # 본문
+		self.ViewInfo["content"] = ""
 		try:
-			print "step1"
 			title = tables[2].get_text()
-			print "step2"
 			self.ViewInfo["content"] = '\r\n' + tables[2].get_text() + '\r\n' + tables[3].get_text()  
-			print "step3"
 		except:
 			pass
 
@@ -151,12 +154,24 @@ class WebProcess(Utility):
 
 
 	def Get(self, url):
+		url2 = url
+		try:
+			url = url.encode("euc-kr", "ignore")
+		except:
+			url = url2
+
 		self.response = self.opener.open(url)
 		self.html = unicode(self.response.read(), "euc-kr", "ignore")
 		self.soup = bs(self.html, "html.parser")
 
 
 	def Post(self, url, d): 
+		url2 = url
+		try:
+			url = url.encode("euc-kr", "ignore")
+		except:
+			url = url2
+
 		self.response = self.opener.open(url, d)
 		self.html = unicode(self.response.read(), "euc-kr", "ignore")
 		self.soup = bs(self.html, "html.parser")
@@ -285,7 +300,6 @@ class Download(Process, WebProcess):
 # 다운완료라면
 			fp.close()
 			self.q.put((100.0, u"다운로드 완료", self.filename, 0, 0))
-
 		self.Play("down.wav", async=False)
 
 

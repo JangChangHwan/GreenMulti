@@ -39,6 +39,12 @@ class GreenMulti(wx.Frame, WebProcess):
 		home_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"홈으로 이동\tAlt+Home")
 		file_menu.Append(home_mi)
 		self.Bind(wx.EVT_MENU, self.OnComeBackHome, home_mi)
+		find_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"검색\tCtrl+F")
+		file_menu.Append(find_mi)
+		self.Bind(wx.EVT_MENU, self.OnFind, find_mi)
+		direct_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"코드 바로가기\tCtrl+G")
+		file_menu.Append(direct_mi)
+		self.Bind(wx.EVT_MENU, self.OnDirectMove, direct_mi)
 		status_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"파일 전송 정보\tCtrl+J")
 		file_menu.Append(status_mi)
 		self.Bind(wx.EVT_MENU, self.OnTransferStatus, status_mi)
@@ -143,6 +149,7 @@ class GreenMulti(wx.Frame, WebProcess):
 
 		if k == wx.WXK_RETURN:
 			n = self.listctrl.GetFocusedItem()
+			if n == -1: return
 			r = self.GetInfo(self.lItemList[n])
 			if r: 
 				self.DisplayItems(r)
@@ -224,6 +231,11 @@ class GreenMulti(wx.Frame, WebProcess):
 			self.GetInfo(("", "", "", self.ListInfo["url"]))
 			self.DisplayItems("list")
 			self.Play("refresh.wav")
+
+		elif k == wx.WXK_F2:
+			n = self.listctrl.GetFocusedItem()
+			if n == -1: return
+			self.MsgBox("", self.lItemList[n][3])
 
 		else:
 			e.Skip()
@@ -463,6 +475,45 @@ class GreenMulti(wx.Frame, WebProcess):
 * 주의 : 이 프로그램은 3월 22일까지 정상동작합니다."""
 
 		self.MsgBox(u"도움말", msg)
+
+	def OnDirectMove(self, e):
+		code = ""
+		dm = DirectMove(self)
+		if dm.ShowModal() == wx.ID_OK:
+			code = dm.combo.GetValue()
+			dm.Destroy()
+		else:
+			dm.Destroy()
+			return
+		if not code or not code in self.dTreeMenu: return
+		r = self.GetInfo((code, "", "", self.dTreeMenu[code][2]))
+		self. DisplayItems(r)
+		self.textctrl1.Clear()
+		self.textctrl2.Clear()
+		self.textctrl3.Clear()
+		self.listctrl.SetFocus()
+		self.Play("code_move.wav")
+
+
+	def OnFind(self, e):
+		if not "find_action" in self.ListInfo or not self.ListInfo["find_action"]: return
+		kwd = self.InputBox(u"게시물 검색", u"키워드")
+		if not kwd: return
+		base_url, d = self.ParamSplit(self.ListInfo["find_action"])
+		d["s_ord_r"] = u"번호2".encode("euc-kr", "ignore")
+		d["field_r"] = "all"
+		d["s_que"] = kwd.encode("euc-kr", "ignore")
+		d["page"] = "1"
+		url = base_url + "?" + self.ParamJoin(d, True)
+		r = self.GetInfo(("", "", "", url))
+		self.DisplayItems(r)
+		self.listctrl.SetFocus()
+		self.textctrl1.Clear()
+		self.textctrl2.Clear()
+		self.textctrl3.Clear()
+		self.Play("page_next.wav")
+
+
 
 
 if __name__ == "__main__":

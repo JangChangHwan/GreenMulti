@@ -295,3 +295,19 @@ class QueueManager(Thread):
 					self.parent.dTransInfo.pop(filename)
 			except:
 				time.sleep(0.1)
+
+
+class DirectMove(wx.Dialog):
+	def __init__(self, parent):
+		wx.Dialog.__init__(self, parent, -1, u"코드 바로가기", wx.DefaultPosition, wx.Size(340, 100))
+		self.parent = parent
+		lbl1 = wx.StaticText(self, -1, u"메뉴 코드나 게시판 코드를 입력하거나 선택하세요.", (10, 10), (320, 20))
+		lbl2 = wx.StaticText(self, -1, u"Code", (10, 40), (100, 20))
+		self.combo = wx.ComboBox(self, -1, "", (120, 40), (210, 20), self.parent.dTreeMenu.keys(), wx.CB_DROPDOWN | wx.CB_SORT | wx.CB_READONLY)
+		btn_ok = wx.Button(self, wx.ID_OK, u"확인", (120, 70), (100, 20))
+		btn_cancel = wx.Button(self, wx.ID_CANCEL, u"취소", (230, 70), (100, 20))
+
+		accel = wx.AcceleratorTable([(wx.ACCEL_NORMAL, wx.WXK_ESCAPE, wx.ID_CANCEL), (wx.ACCEL_NORMAL, wx.WXK_RETURN, wx.ID_OK)])
+		self.SetAcceleratorTable(accel)
+
+
