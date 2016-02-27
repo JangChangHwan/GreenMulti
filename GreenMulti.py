@@ -139,7 +139,10 @@ class GreenMulti(wx.Frame, WebProcess):
 				index = self.listctrl.InsertItem(sys.maxint, t[1])
 				self.listctrl.SetItem(index, 1, t[2])
 		elif mode == "view":
-			self.textctrl1.SetValue(self.ViewInfo["content"])
+			text = self.ViewInfo["content"]
+			text = text.replace("\r", "")
+			text = re.sub(r"(.*)(\n+)(.*)", r"\1\r\n\3", text)
+			self.textctrl1.SetValue(text)
 			self.textctrl2.SetValue(self.ViewInfo["replies"])
 			self.textctrl3.Clear()
 
@@ -200,7 +203,10 @@ class GreenMulti(wx.Frame, WebProcess):
 			res = self.opener.open(self.lItemList[n][3])
 			html = unicode(res.read(), "euc-kr", "ignore")
 			soup = bs(html, "html.parser")
-			deltag = soup.find("a", href=re.compile(r"(?ims)cmd=delete"))
+			if "mail.php" in self.lItemList[n][3]:
+				deltag = soup.find("a", href=re.compile(r"(?ims)cmd=del2"))
+			else:
+				deltag = soup.find("a", href=re.compile(r"(?ims)cmd=delete"))
 			if deltag is None: return
 			self.DeleteArticle(self.ListInfo["host"] + deltag["href"])
 

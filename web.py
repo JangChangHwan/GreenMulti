@@ -30,7 +30,11 @@ class WebProcess(Utility):
 
 
 	def GetInfo(self, t):
-		if "cmd=view" in t[3]:
+		if "mail.php" in t[3] and "cmd=list" in t[3]:
+			r = self.GetMailList(t)
+		elif "mail.php" in t[3] and "cmd=view" in t[3]:
+			r = self.GetMailView(t)
+		elif "cmd=view" in t[3]:
 			r = self.GetView(t)
 		elif not ("bcode=" in t[3]):
 			r = self.GetMenu(t)
@@ -150,6 +154,78 @@ class WebProcess(Utility):
 			for h in hiddens:
 				self.ViewInfo["data"][h['name']] = h['value']
 
+		return "view" if self.ViewInfo["content"] else False
+
+
+
+	def GetMailList(self, t):
+# 게시물 목록 뽑아내기 / 게시판 코드가 있으면 bcode에 넣고 없으면 패스
+		self.lItemList = []
+		self.ListInfo.clear()
+		self.ListInfo["host"] = re.sub(r"(?ims)^(http.?://[^/]+)(/.+)", r"\1", t[3])
+		self.Get(t[3])
+		self.ListInfo["url"] = self.response.url
+		links = self.soup("a", href=re.compile(r"(?ims)cmd=view"))
+		if links is None: return False
+		for l in links:
+			href = ""
+			title = ""
+			author = ""
+# 링크 주소를 href에 저장
+			try:
+						href = self.ListInfo["host"] + l["href"]
+			except:
+				pass
+# 보낸이를 title에 저장
+			try:
+				author = l.get_text()
+			except:
+				pass
+# 제목인지를 검사하고 title에 저장
+			try:
+				l2 = l.parent.next_sibling.next_sibling.a
+				if l["href"] != l2["href"]: continue
+				title = l2.get_text()
+			except:
+				continue
+
+			if not author and (title == u"이용약관" or title == u"개인정보취급방침"): continue
+			self.lItemList.append(("", title, author, href))
+		if t[0]: self.bcode = t[0]
+		return "list" if self.lItemList else False
+
+
+
+	def GetMailView(self, t):
+		self.ViewInfo.clear()
+		self.Get(t[3])
+		self.ViewInfo["url"] = self.response.url
+
+		tables = self.soup('table')
+
+# 본문
+		self.ViewInfo["content"] = ""
+		try:
+			title = tables[3].get_text()
+			self.ViewInfo["content"] = tables[3].get_text() + tables[4].get_text()  
+		except:
+			pass
+
+# 첨부파일
+		dFiles = {}
+		files = self.soup(name='a', href=re.compile(r'(?i)cmd=download'))
+		for f in files:
+			try:
+				dFiles[f.img['alt']] = self.ListInfo['host'] + f['href']
+			except:
+				pass
+		self.ViewInfo["files"] = dFiles
+
+		self.ViewInfo["replies"] = ""
+
+# 삭제버튼
+		dellink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=del2'))
+		if dellink is not None: self.ViewInfo['delete_url'] = self.ListInfo['host'] + dellink['href']
 		return "view" if self.ViewInfo["content"] else False
 
 
