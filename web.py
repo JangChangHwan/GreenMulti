@@ -293,31 +293,35 @@ class Upload(Process, WebProcess):
 			if file and os.path.exists(file): 
 				self.file = file.encode("euc-kr", "ignore")
 			else:
-				self.file = False
+				self.file = ""
 			if not self.KbuLogin(): return
 			self.run()
 		except:
 			self.Play("error.wav", async=False)
 
 	def KbuLogin(self):
-#		try:
+		try:
 			kbuid = self.Decrypt(self.ReadReg('kbuid'))
 			kbupw = self.Decrypt(self.ReadReg('kbupw'))
 			params = {"ret":"notice_top", "ret2":"", "cmd":"check_login", "log_id":kbuid, "log_passwd":kbupw}
 			self.Post('http://web.kbuwel.or.kr/menu/login.php', params)
 			if not("login=true" in self.soup.get_text()): return False
 			return True
-#		except:
-#			return False
+		except:
+			return False
 
 	def run(self):
 		host, data = self.ParamSplit(self.action)
 		data[u"제목".encode("euc-kr", "ignore")] = self.title
 		data["tbody"] = self.body
-		if self.file: data["up_file1"] = open(self.file, "rb")
-		self.q.put((0, u"업로드 중", self.file, 0, 0))
+		file = ""
+		if self.file: 
+			data["up_file1"] = open(self.file, "rb")
+			file = self.file if type(self.file) == unicode else unicode(self.file, "euc-kr", "ignore")
+
+		if file: self.q.put((0, u"업로드 중", file, 0, 0))
 		self.Post(host, data)
-		self.q.put((100, u"업로드 완료", self.file, 0, 0))
+		if file: self.q.put((100, u"업로드 완료", file, 0, 0))
 		self.Play("up.wav", async=False)
 
 
@@ -333,7 +337,7 @@ class Download(Process, WebProcess):
 		self.filename = f
 		self.url = u
 		self.downfolder = self.ReadReg("downfolder")
-		if not self.downfolder: self.downfolder = "C:\\"
+		if not self.downfolder: self.downfolder = "c:\\"
 		if not self.KbuLogin(): return
 		self.run()
 
@@ -362,7 +366,8 @@ class Download(Process, WebProcess):
 # 로컬디스크에서 파일 크기를 보고 크기가 같으면 다운로드 종료
 		if not os.path.exists(filepath) or os.path.getsize(filepath) != file_size:
 			fp = open(filepath, "wb")
-			self.q.put((0, u"다운로드 중", self.filename, 0, 0)) # (up/down, filename, speed, remain)
+			file = self.filename if type(self.filename) == unicode else unicode(self.filename, "euc-kr", "ignore")
+			self.q.put((0, u"다운로드 중", file, 0, 0)) # (up/down, filename, speed, remain)
 			while True:
 				buffer = res.read(block_size)
 				if not buffer: break
@@ -372,10 +377,72 @@ class Download(Process, WebProcess):
 				t = time.time() - start_time
 				speed = down_size / t / 1024 / 1024
 				remain = t * file_size / down_size
-				self.q.put((per, u"다운로드 중", self.filename, speed, remain))
+				self.q.put((per, u"다운로드 중", file, speed, remain))
 # 다운완료라면
 			fp.close()
-			self.q.put((100.0, u"다운로드 완료", self.filename, 0, 0))
+			self.q.put((100.0, u"다운로드 완료", file, 0, 0))
 		self.Play("down.wav", async=False)
 
+
+class SendMail(Process, WebProcess):
+	def __init__(self, q, receiver, coreceiver, title, body, file1, file2, file3):
+#		try:
+			Process.__init__(self)
+			Utility.__init__(self)
+			WebProcess.__init__(self)
+			self.action = u"http://web.kbuwel.or.kr/menu/mail.php?cmd=send&".encode("euc-kr", "ignore")
+			self.receiver = receiver.encode("euc-kr", "ignore")
+			self.coreceiver = coreceiver.encode("euc-kr", "ignore") if coreceiver else ""
+			self.title = title.encode("euc-kr", "ignore")
+			self.body = body.encode("euc-kr", "ignore")
+			self.q = q
+			if file1 and os.path.exists(file1): 
+				self.file1 = file1.encode("euc-kr", "ignore")
+			else:
+				self.file1 = ""
+			if file2 and os.path.exists(file2): 
+				self.file2 = file2.encode("euc-kr", "ignore")
+			else:
+				self.file2 = ""
+			if file3 and os.path.exists(file3): 
+				self.file3 = file3.encode("euc-kr", "ignore")
+			else:
+				self.file3 = ""
+
+			if not self.KbuLogin(): return
+			self.run()
+#		except:
+#			self.Play("error.wav", async=False)
+
+	def KbuLogin(self):
+		try:
+			kbuid = self.Decrypt(self.ReadReg('kbuid'))
+			kbupw = self.Decrypt(self.ReadReg('kbupw'))
+			params = {"ret":"notice_top", "ret2":"", "cmd":"check_login", "log_id":kbuid, "log_passwd":kbupw}
+			self.Post('http://web.kbuwel.or.kr/menu/login.php', params)
+			if not("login=true" in self.soup.get_text()): return False
+			return True
+		except:
+			return False
+
+	def run(self):
+		host, data = self.ParamSplit(self.action)
+		data[u"받는사람".encode("euc-kr", "ignore")] = self.receiver
+		if self.coreceiver: data[u"함께받는이".encode("euc-kr", "ignore")] = self.coreceiver
+		data[u"제목".encode("euc-kr", "ignore")] = self.title
+		data[u"태그".encode("euc-kr", "ignore")] = u"2".encode("euc-kr", "ignore")
+
+		data["tbody"] = self.body
+		if self.file1: data["up_file1"] = open(self.file1, "rb")
+		if self.file2: data["up_file2"] = open(self.file2, "rb")
+		if self.file3: data["up_file3"] = open(self.file3, "rb")
+		file = ""
+		if self.file1 or self.file2 or self.file3:
+			file = self.file1 + "|" + self.file2 + "|" + self.file3
+		if type(file) == str: file = unicode(file, "euc-kr", "ignore")
+
+		if file: self.q.put((0, u"업로드 중", file, 0, 0))
+		self.Post(host, data)
+		if file: self.q.put((100, u"업로드 완료", file, 0, 0))
+		self.Play("up.wav", async=False)
 

@@ -153,6 +153,11 @@ class GreenMulti(wx.Frame, WebProcess):
 		if k == wx.WXK_RETURN:
 			n = self.listctrl.GetFocusedItem()
 			if n == -1: return
+
+			if "mail.php" in self.lItemList[n][3] and "cmd=write" in self.lItemList[n][3]:
+				self.WriteMail(u"메일 쓰기", receiver="", retitle="", rebody="")
+				return
+
 			r = self.GetInfo(self.lItemList[n])
 			if r: 
 				self.DisplayItems(r)
@@ -390,7 +395,9 @@ class GreenMulti(wx.Frame, WebProcess):
 			if not title or not body: return self.MsgBox(u"오류", u"게시물 제목과 본문 내용은 필수 입력사항입니다. 게시물을 올릴 수 없습니다.")
 			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.ResQ))
 			p.start()
-			if file: self.dProcess[file] = p
+			if file: 
+				filename = file if type(file) == unicode else unicode(file, "euc-kr", "ignore")
+				self.dProcess[filename] = p
 
 		else:
 			wd.Destroy()
@@ -409,7 +416,7 @@ class GreenMulti(wx.Frame, WebProcess):
 			if not title or not body: return self.MsgBox(u"오류", u"게시물 제목과 본문 내용은 필수 입력사항입니다. 게시물을 올릴 수 없습니다.")
 			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.ResQ))
 			p.start()
-			if file: self.dProcess[file] = p
+#			if file: self.dProcess[file] = p
 		else:
 			wd.Destroy()
 
@@ -430,7 +437,8 @@ class GreenMulti(wx.Frame, WebProcess):
 		for f, u in d.items():
 			p = Process(target=Download, args=(f, u, self.ResQ))
 			p.start()
-			self.dProcess[f] = p
+			filename = f if type(f) == unicode else unicode(f, "euc-kr", "ignore")
+			self.dProcess[filename] = p
 			
 
 	def OnTransferStatus(self, e):
@@ -519,6 +527,30 @@ class GreenMulti(wx.Frame, WebProcess):
 		self.textctrl3.Clear()
 		self.Play("page_next.wav")
 
+
+	def WriteMail(self, title, receiver="", retitle="", rebody=""):
+		wd = WriteMailDialog(self, title, receiver, retitle, rebody)
+		if wd.ShowModal() == wx.ID_OK:
+			receiver = wd.textctrl1.GetValue()
+			coreceiver = wd.textctrl2.GetValue()
+			title = wd.textctrl3.GetValue()
+			body = wd.textctrl4.GetValue() + "\n"
+			file1 = wd.attach1
+			file2 = wd.attach2
+			file3 = wd.attach3
+			wd.Destroy()
+			if not receiver or not title or not body: return self.MsgBox(u"오류", u"받는 사람, 제목, 본문 내용은 필수 입력사항입니다. 메일을 전송할 수 없습니다.")
+
+			p = Process(target=SendMail, args=(self.ResQ, receiver, coreceiver, title, body, file1, file2, file3))
+			p.start()
+			filename = ""
+			if file1 or file2 or file3: 
+				filename = self.dProcess[file1 + "|" + file2 +"|" + file3] = p
+				if type(filename) == str: filename = unicode(filename, "euc-kr", "ignore")
+				self.dProcess[filename] = p
+
+		else:
+			wd.Destroy()
 
 
 

@@ -258,6 +258,10 @@ class TransferStatus(wx.Dialog):
 		self.listctrl.DeleteAllItems()
 		if not self.parent.dTransInfo: return
 		for k, v in self.parent.dTransInfo.items():
+# 완료된 내용 삭제
+			if v[0] == 100: 
+				self.parent.dTransInfo.pop(k)
+				continue
 			k2 = k
 # 한글 포함 여부에 따라 파일 이름 정리
 			try:
@@ -288,7 +292,8 @@ class QueueManager(Thread):
 			try:
 				if self.parent.msg == "exit": break
 				per, mode, filename, speed, remain = self.parent.ResQ.get_nowait()
-				if per < 100.0:
+				if per < 100.0 or filename:
+					if type(filename) == str: filename = unicode(filename, "euc-kr", "ignore")
 					self.parent.dTransInfo[filename] = (per, mode, speed, remain)
 				else:
 					self.parent.dProcess.pop(filename)
@@ -310,4 +315,83 @@ class DirectMove(wx.Dialog):
 		accel = wx.AcceleratorTable([(wx.ACCEL_NORMAL, wx.WXK_ESCAPE, wx.ID_CANCEL), (wx.ACCEL_NORMAL, wx.WXK_RETURN, wx.ID_OK)])
 		self.SetAcceleratorTable(accel)
 
+
+
+class WriteMailDialog(wx.Dialog):
+	def __init__(self, parent, title, receiver="", retitle="", rebody=""):
+		wx.Dialog.__init__(self, parent, -1, title, wx.DefaultPosition, wx.Size(670, 570))
+		self.receiver = receiver
+		self.retitle = retitle
+		self.rebody = rebody
+		self.attach1 = ""
+		self.attach2 = ""
+		self.attach3 = ""
+
+		lbl_recv = wx.StaticText(self, -1, u'받는사람', (10, 10), (100, 20))
+		self.textctrl1 = wx.TextCtrl(self, -1, self.receiver, (120, 10), (540, 20))
+		lbl_corecv = wx.StaticText(self, -1, u'함께받는사람', (10, 40), (100, 20))
+		self.textctrl2 = wx.TextCtrl(self, -1, "", (120, 40), (540, 20))
+		lbl_title = wx.StaticText(self, -1, u'제목', (10, 70), (100, 20))
+		self.textctrl3 = wx.TextCtrl(self, -1, self.retitle, (120, 70), (540, 20))
+
+		lbl_body = wx.StaticText(self, -1, u'내용', (10, 100), (100, 20))
+		self.textctrl4 = wx.TextCtrl(self, -1, self.rebody, (120, 100), (540, 400), wx.TE_MULTILINE)
+
+		self.btn_attach1 = wx.Button(self, -1, u'첨부파일 #1', (10, 510), (210, 20))
+		self.btn_attach1.Bind(wx.EVT_BUTTON, self.OnAttach1)
+		self.btn_attach2 = wx.Button(self, -1, u'첨부파일 #2', (230, 510), (210, 20))
+		self.btn_attach2.Bind(wx.EVT_BUTTON, self.OnAttach2)
+		self.btn_attach3 = wx.Button(self, -1, u'첨부파일 #3', (450, 510), (210, 20))
+		self.btn_attach3.Bind(wx.EVT_BUTTON, self.OnAttach3)
+
+		self.btn_save = wx.Button(self, wx.ID_OK, u'전송', (230, 540), (100, 20))
+		self.btn_cancel = wx.Button(self, wx.ID_CANCEL, u'취소', (340, 540), (100, 20))
+
+# 단축키 지정
+		accel = wx.AcceleratorTable([(wx.ACCEL_NORMAL, wx.WXK_ESCAPE, wx.ID_CANCEL)])
+		self.SetAcceleratorTable(accel)
+
+	def OnAttach1(self, e):
+		if self.attach1:
+			self.attach1 = ""
+			self.btn_attach1.SetLabel(u"첨부 파일 #1")
+			return self.MsgBox(u"첨부파일 취소", u"첨부파일 등록을 취소했습니다.")
+
+		fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
+		if fd.ShowModal() == wx.ID_OK:
+			path = fd.GetPath()
+			if path == self.attach2 or path == self.attach3: return self.MsgBox("경고", "이미 첨부 파일로 지정되어 있습니다. 파일 첨부를 취소합니다.")
+			self.attach1 = path
+			self.btn_attach1.SetLabel(self.attach1)
+
+	def OnAttach2(self, e):
+		if self.attach2:
+			self.attach2 = ""
+			self.btn_attach2.SetLabel(u"첨부 파일 #2")
+			return self.MsgBox(u"첨부파일 취소", u"첨부파일 등록을 취소했습니다.")
+
+		fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
+		if fd.ShowModal() == wx.ID_OK:
+			path = fd.GetPath()
+			if path == self.attach1 or path == self.attach3: return self.MsgBox("경고", "이미 첨부 파일로 지정되어 있습니다. 파일 첨부를 취소합니다.")
+			self.attach2 = path
+			self.btn_attach2.SetLabel(self.attach2)
+
+	def OnAttach3(self, e):
+		if self.attach3:
+			self.attach3 = ""
+			self.btn_attach3.SetLabel(u"첨부 파일 #3")
+			return self.MsgBox(u"첨부파일 취소", u"첨부파일 등록을 취소했습니다.")
+
+		fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
+		if fd.ShowModal() == wx.ID_OK:
+			path = fd.GetPath()
+			if path == self.attach1 or path == self.attach2: return self.MsgBox("경고", "이미 첨부 파일로 지정되어 있습니다. 파일 첨부를 취소합니다.")
+			self.attach3 = path
+			self.btn_attach3.SetLabel(self.attach3)
+
+	def MsgBox(self, title, text):
+		d = wx.MessageDialog(self, text, title, wx.OK)
+		d.ShowModal()
+		d.Destroy()
 
