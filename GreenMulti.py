@@ -458,6 +458,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		self.textctrl2.Clear()
 		self.textctrl3.Clear()
 		self.listctrl.SetFocus()
+		self.Play("delete.wav")
 
 
 	def Download(self, d):

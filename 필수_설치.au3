@@ -54,5 +54,9 @@ MsgBox(0, "모듈 업그레이드", "이 프로그램에 필요한 모듈을 최신으로 업그레이드합�
 $pid2 = Run(@scriptdir & "\모듈_업그레이드.bat")
 if @error then exit msgbox(0, "모듈 업그레이드 실패", "필수 모듈 업그레이드에 실패했습니다. 수동으로 모듈_업그레이드.bat 파일을 실행해 보세요.")
 processwaitclose($pid2)
-Exit msgbox(0, "설치 완료", "프로그램 실행을 위한 준비를 완료했습니다.", 5)
+if MsgBox(1, "바탕화면 바로가기 생성", "바탕화면에 Green_Multi 바로가기를 만들까요? 이미 존재한다면 삭제하고 재설치합니다.") = 1 then 
+; 기존의 파일이 있다면 삭제
+if fileexists(@desktopdir & "\Green_Multi.lnk") then filedelete(@desktopdir & "\Green_Multi.lnk") 
+filecreateshortcut(@scriptdir & "\Green_Multi.bat", @desktopdir & "\Green_Multi.lnk", @scriptdir) 
+endif
 EndFunc
