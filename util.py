@@ -142,6 +142,28 @@ class Utility():
 			params = "&".join(["%s=%s" % (k, v) for k, v in d.items()])
 		return params
 
+	def u_InputBox(self, title, text, pwd=False):
+		style = wx.OK | wx.CANCEL | wx.TE_PASSWORD if pwd else wx.OK | wx.CANCEL
+		entry = wx.TextEntryDialog(None, text, title, '', style)
+		if entry.ShowModal() == wx.ID_OK: return entry.GetValue()
+		entry.Destroy()
+
+
+	def u_MsgBox(self, title, text, question=False):
+		if question:
+			d = wx.MessageDialog(None, text, title, wx.OK | wx.CANCEL)
+			if d.ShowModal() == wx.ID_OK:
+				return True
+			else:
+				return False
+			d.Destroy()
+
+		else:
+			d = wx.MessageDialog(self, text, title, wx.OK)
+			d.ShowModal()
+			d.Destroy()
+
+
 
 class WriteDialog(wx.Dialog):
 	def __init__(self, parent, title, soup):

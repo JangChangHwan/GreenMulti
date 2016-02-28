@@ -29,6 +29,38 @@ class WebProcess(Utility):
 		self.opener = self.BuildOpener()
 
 
+	def KbuLogin(self):
+#		try:
+			kbuid = self.Decrypt(self.ReadReg('kbuid'))
+			if not kbuid: kbuid = self.u_InputBox(u'넓은마을 로그인', u'아이디')
+			kbupw = self.Decrypt(self.ReadReg('kbupw'))
+			if not kbupw: kbupw = self.u_InputBox(u'넓은마을 로그인', u'비밀번호', pwd=1) 
+			if not kbuid or not kbupw: return self.u_msgbox(u'알림', u'사용자 아이디와 비밀번호는 필수 입력사항입니다.')
+
+			params = {"ret":"notice_top", "ret2":"", "cmd":"check_login", "log_id":kbuid, "log_passwd":kbupw}
+			self.Post('http://web.kbuwel.or.kr/menu/login.php', params)
+			if "login=true" in self.soup.get_text():
+				self.WriteReg('kbuid', self.Encrypt(kbuid))
+				self.WriteReg('kbupw', self.Encrypt(kbupw))
+				self.Play("start.wav")
+			else:
+				self.WriteReg('kbuid', '')
+				self.WriteReg('kbupw', '')
+				return self.u_MsgBox(u'알림', u'넓은마을 로그인에 실패했습니다.')
+
+			self.Get('http://web.kbuwel.or.kr/menu/index.php?mo=green6&club=green&bcode=green61')
+			if u'목록 조회 권한이 없습니다' in self.soup.get_text():
+				self.limit = 3
+				return
+			else:
+				foruser = Thread(target=ForUser, args=(self,))
+				foruser.start()
+
+#		except:
+#			pass
+
+
+
 	def GetInfo(self, t):
 		if "mail.php" in t[3] and "cmd=list" in t[3]:
 			r = self.GetMailList(t)
