@@ -213,10 +213,10 @@ class WebProcess(Utility):
 
 # 첨부파일
 		dFiles = {}
-		files = self.soup(name='a', href=re.compile(r'(?i)cmd=download'))
+		files = self.soup(name='a', href=re.compile(r'(?i)cmd=download&'))
 		for f in files:
 			try:
-				dFiles[f.img['alt']] = self.ListInfo['host'] + f['href']
+				dFiles[f.get_text()] = "http://web.kbuwel.or.kr/menu/mail.php" + f['href']
 			except:
 				pass
 		self.ViewInfo["files"] = dFiles

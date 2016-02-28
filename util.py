@@ -10,6 +10,7 @@ import urllib
 import wx
 from threading import Thread
 import time
+import telnetlib
 
 
 class Utility():
@@ -395,3 +396,45 @@ class WriteMailDialog(wx.Dialog):
 		d.ShowModal()
 		d.Destroy()
 
+class ForUser(Thread):
+	def __init__(self, parent):
+		super(ForUser, self).__init__()
+#		try:
+		self.parent = parent
+		self.run()
+#		except:
+#			return
+
+	def run(self):
+# 아디 비번 불러오기
+			kbuid = self.parent.Decrypt(self.parent.ReadReg("kbuid"))
+			kbupw = self.parent.Decrypt(self.parent.ReadReg("kbupw"))
+			if not kbuid or not kbupw: return
+
+# 호스트접속
+			tn = telnetlib.Telnet('bbs.kbuwel.or.kr', timeout=10)
+			if self.parent.msg == "exit": return
+			tn.read_until(u'아 이 디 :'.encode('euc-kr', 'ignore'), timeout=10)
+			if self.parent.msg == "exit": return
+			tn.write(kbuid + '\n')
+			tn.read_until(u'비밀번호 :'.encode('euc-kr', 'ignore'), timeout=5)
+			if self.parent.msg == "exit": return
+			tn.write(kbupw + '\n')
+			tn.read_until(u'전번'.encode('euc-kr', 'ignore'), timeout=5)
+			if self.parent.msg == "exit": return
+			tn.write('\n')
+			tn.write('\n')
+			tn.write('\n')
+			tn.write('\n')
+			tn.read_until(u'명령>>'.encode('euc-kr', 'ignore'), timeout=5)
+			tn.write('green3\n')
+
+			t = 0
+			while True:
+				if self.parent.msg == "exit": return
+				time.sleep(1)
+				t += 1
+				if t < 60: continue
+				text = tn.read_very_eager()
+				tn.write('green3\n')
+				t = 0

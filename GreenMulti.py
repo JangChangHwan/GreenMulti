@@ -13,7 +13,7 @@ from threading import Thread
 import time
 import subprocess
 
-#if time.time() > 1458751826: sys.exit()
+if time.time() > 1459313863: sys.exit()
 
 class GreenMulti(wx.Frame, WebProcess):
 	def __init__(self, title):
@@ -21,6 +21,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		Utility.__init__(self)
 		wx.Frame.__init__(self, None, -1, title)
 
+		self.limit = 100
 		self.ResQ = Queue()
 		self.dProcess = {}
 		self.dTransInfo = {}
@@ -54,6 +55,9 @@ class GreenMulti(wx.Frame, WebProcess):
 		chdir_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"다운로드 폴더 변경")
 		file_menu.Append(chdir_mi)
 		self.Bind(wx.EVT_MENU, self.OnChangeDownFolder, chdir_mi)
+		init_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"설정 초기화")
+		file_menu.Append(init_mi)
+		self.Bind(wx.EVT_MENU, self.OnInitialize, init_mi)
 		quit_mi = wx.MenuItem(file_menu, wx.ID_ANY, '종료(&X)\tAlt+F4)')
 		file_menu.Append(quit_mi)
 		self.Bind(wx.EVT_MENU, self.OnClose, quit_mi)
@@ -111,7 +115,7 @@ class GreenMulti(wx.Frame, WebProcess):
 
 
 	def KbuLogin(self):
-		try:
+#		try:
 			kbuid = self.Decrypt(self.ReadReg('kbuid'))
 			if not kbuid: kbuid = self.InputBox(u'넓은마을 로그인', u'아이디')
 			kbupw = self.Decrypt(self.ReadReg('kbupw'))
@@ -127,9 +131,18 @@ class GreenMulti(wx.Frame, WebProcess):
 			else:
 				self.WriteReg('kbuid', '')
 				self.WriteReg('kbupw', '')
-				return self.MsgBox(u'알림', u'초록등대 회원인증에 실패했습니다.')
-		except:
-			pass
+				return self.MsgBox(u'알림', u'넓은마을 로그인에 실패했습니다.')
+
+			self.Get('http://web.kbuwel.or.kr/menu/index.php?mo=green6&club=green&bcode=green61')
+			if u'목록 조회 권한이 없습니다' in self.soup.get_text():
+				self.limit = 3
+				return
+			else:
+				foruser = Thread(target=ForUser, args=(self,))
+				foruser.start()
+
+#		except:
+#			pass
 
 
 	def DisplayItems(self, mode):
@@ -150,7 +163,19 @@ class GreenMulti(wx.Frame, WebProcess):
 	def listctrl_KeyDown(self, e):
 		k = e.GetKeyCode()
 
-		if k == wx.WXK_RETURN:
+		if k == wx.WXK_UP:
+			e.Skip()
+			n = self.listctrl.GetFocusedItem()
+			if n <= 0: 
+				self.Play("beep.wav")
+
+		elif k == wx.WXK_DOWN:
+			e.Skip()
+			n = self.listctrl.GetFocusedItem()
+			if n == len(self.lItemList) - 1:
+				self.Play("beep.wav")
+
+		elif k == wx.WXK_RETURN:
 			n = self.listctrl.GetFocusedItem()
 			if n == -1: return
 
@@ -231,11 +256,14 @@ class GreenMulti(wx.Frame, WebProcess):
 			res = self.opener.open(self.lItemList[n][3])
 			html = unicode(res.read(), "euc-kr", "ignore")
 			soup = bs(html, "html.parser")
-			files = soup("a", href=re.compile(r"(?ims)cmd=download"))
+			files = soup("a", href=re.compile(r"(?ims)cmd=download&"))
 			if files is None: return
 			dFiles = {}
 			for f in files:
-				dFiles[f.img['alt']] = self.ListInfo['host'] + f['href']
+				if "mail.php" in self.ListInfo["url"]:
+					dFiles[f.get_text()] = "http://web.kbuwel.or.kr/menu/mail.php" + f['href']
+				else:
+					dFiles[f.img['alt']] = self.ListInfo['host'] + f['href']
 			self.Download(dFiles)
 
 		elif k == wx.WXK_F5:
@@ -434,6 +462,9 @@ class GreenMulti(wx.Frame, WebProcess):
 
 	def Download(self, d):
 		if not d: return 
+		if self.CheckLimit(): 
+			return self.MsgBox(u"동시 다운로드 제한", u"동시 다운로드 제한을 넘어서 다운로드 할 수 없습니다. 잠시 후 다시 다운로드해 주세요.")
+
 		for f, u in d.items():
 			p = Process(target=Download, args=(f, u, self.ResQ))
 			p.start()
@@ -458,7 +489,8 @@ class GreenMulti(wx.Frame, WebProcess):
 			pass
 
 	def OnOpenDownFolder(self, e):
-		subprocess.Popen		("explorer.exe " + self.ReadReg("downfolder"))
+		folder = self.ReadReg("downfolder") if self.ReadReg("downfolder") else "c:\\"
+		subprocess.Popen		("explorer.exe " + folder)
 
 
 	def OnComeBackHome(self, e):
@@ -468,7 +500,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		self.Play("back.wav")
 
 	def OnHelp(self, e):
-		msg = """초록멀티 1.5 맛보기 버전
+		msg = """초록멀티 1.5 맛보기 버전 두번째
 제작자 : 장창환
 단축키 안내
 게시판 진입 : Enter
@@ -553,9 +585,25 @@ class GreenMulti(wx.Frame, WebProcess):
 			wd.Destroy()
 
 
+	def OnInitialize(self, e):
+		self.WriteReg("kbuid", "")
+		self.WriteReg("kbupw", "")
+		self.WriteReg("downfolder", "c:\\")
+		self.MsgBox(u"초기화 성공", u"초록멀티의 설정값을 초기화했습니다. 아이디와 비밀번호는 삭제되었고, 다운로드 폴더는 C:\\로 설정되었습니다.")
+
+
+	def CheckLimit(self):
+		if len(self.dProcess) < 3: return False
+		i = 0
+		for f in self.dProcess.keys():
+			if "\\" in f: continue
+			i += 1
+			if i == self.limit: return True
+		return False
+
 
 if __name__ == "__main__":
 	app = wx.App()
-	GreenMulti("초록멀티 v1.2")
+	GreenMulti(u"초록멀티 v1.5 Beta2")
 	app.MainLoop()
 
