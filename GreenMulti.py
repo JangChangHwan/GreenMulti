@@ -230,7 +230,8 @@ class GreenMulti(wx.Frame, WebProcess):
 		elif k == wx.WXK_DELETE:
 			n = self.listctrl.GetFocusedItem()
 			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
-			res = self.opener.open(self.lItemList[n][3])
+			url = self.lItemList[n][3] if type(self.lItemList[n][3]) == str else self.lItemList[n][3].encode("euc-kr", "ignore")
+			res = self.opener.open(url)
 			html = unicode(res.read(), "euc-kr", "ignore")
 			soup = bs(html, "html.parser")
 			if "mail.php" in self.lItemList[n][3]:
@@ -243,7 +244,9 @@ class GreenMulti(wx.Frame, WebProcess):
 		elif k == ord("E") or k == ord("e"):
 			n = self.listctrl.GetFocusedItem()
 			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
-			res = self.opener.open(self.lItemList[n][3])
+			url = self.lItemList[n][3]
+			if type(url) == unicode: url = url.encode("euc-kr", "ignore")
+			res = self.opener.open(url)
 			html = unicode(res.read(), "euc-kr", "ignore")
 			soup = bs(html, "html.parser")
 			edittag = soup.find("a", href=re.compile(r"(?ims)cmd=edit"))
@@ -253,7 +256,8 @@ class GreenMulti(wx.Frame, WebProcess):
 		elif k == ord("D") or k == ord("d"):
 			n = self.listctrl.GetFocusedItem()
 			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
-			res = self.opener.open(self.lItemList[n][3])
+			url = self.lItemList[n][3] if type(self.lItemList[n][3]) == str else self.lItemList[n][3].encode("euc-kr", "ignore")
+			res = self.opener.open(url)
 			html = unicode(res.read(), "euc-kr", "ignore")
 			soup = bs(html, "html.parser")
 			files = soup("a", href=re.compile(r"(?ims)cmd=download&"))
@@ -410,7 +414,9 @@ class GreenMulti(wx.Frame, WebProcess):
 
 	def WriteArticle(self):
 		if not ("write_url" in self.ListInfo) or not self.ListInfo["write_url"]: return
-		res = self.opener.open(self.ListInfo["write_url"])
+		url = self.ListInfo["write_url"]
+		if type(url) == unicode: url = url.encode("euc-kr", "ignore")
+		res = self.opener.open(url)
 		html = res.read()
 		soup = bs(unicode(html, "euc-kr", "ignore"), "html.parser")
 		wd = WriteDialog(self, u"게시물 쓰기", soup)
@@ -431,6 +437,7 @@ class GreenMulti(wx.Frame, WebProcess):
 			wd.Destroy()
 
 	def EditArticle(self, url):
+		if type(url) == unicode: url = url.encode("euc-kr", "ignore")
 		res = self.opener.open(url)
 		html = res.read()
 		soup = bs(unicode(html, "euc-kr", "ignore"), "html.parser")
@@ -449,6 +456,7 @@ class GreenMulti(wx.Frame, WebProcess):
 			wd.Destroy()
 
 	def DeleteArticle(self, url):
+		url = url if type(url) == str else url.encode("euc-kr", "ignore")
 		list_url = self.ListInfo["url"]
 		if not self.MsgBox(u"삭제 경고", u"정말로 게시물을 삭제할까요?", True): return
 		self.Get(url)
@@ -605,6 +613,6 @@ class GreenMulti(wx.Frame, WebProcess):
 
 if __name__ == "__main__":
 	app = wx.App()
-	GreenMulti(u"초록멀티 v1.5 Beta2")
+	GreenMulti(u"초록멀티 v1.5 Beta3")
 	app.MainLoop()
 

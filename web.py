@@ -60,7 +60,7 @@ class WebProcess(Utility):
 		self.ListInfo.clear()
 		self.ListInfo["host"] = re.sub(r"(?ims)^(http.?://[^/]+)(/.+)", r"\1", t[3])
 		self.Get(t[3])
-		self.ListInfo["url"] = self.response.url
+		self.ListInfo["url"] = self.response.url 
 		links = self.soup("a", href=re.compile(r"(?ims)cmd=view"))
 		if links is None: return False
 		for l in links:
@@ -87,11 +87,11 @@ class WebProcess(Utility):
 		if t[0]: self.bcode = t[0]
 # 글쓰기 버튼 추출
 		wlink = self.soup.find(name='a', href=re.compile(r'(?i)cmd=write'))
-		if wlink is not None: self.ListInfo['write_url'] = self.ListInfo['host'] + wlink['href']
+		if wlink is not None: self.ListInfo['write_url'] = self.ListInfo['host'] + wlink['href'] 
 # 게시물 검색 action 주소를 ListInfo["find_action"]에 저장
 		self.ListInfo["find_action"] = ""
 		find = self.soup.find("form", attrs={"name":"form_search"})
-		if find is not None: self.ListInfo["find_action"] = self.ListInfo["host"] + find["action"]
+		if find is not None: self.ListInfo["find_action"] = self.ListInfo["host"] + find["action"] 
 
 		self.ViewInfo = {}
 		return "list" if href else False
@@ -230,24 +230,14 @@ class WebProcess(Utility):
 
 
 	def Get(self, url):
-		url2 = url
-		try:
-			url = url.encode("euc-kr", "ignore")
-		except:
-			url = url2
-
+		if type(url) == unicode: url = url.encode("euc-kr", "ignore")
 		self.response = self.opener.open(url)
 		self.html = unicode(self.response.read(), "euc-kr", "ignore")
 		self.soup = bs(self.html, "html.parser")
 
 
 	def Post(self, url, d): 
-		url2 = url
-		try:
-			url = url.encode("euc-kr", "ignore")
-		except:
-			url = url2
-
+		if type(url) == unicode: url = url.encode("euc-kr", "ignore")
 		self.response = self.opener.open(url, d)
 		self.html = unicode(self.response.read(), "euc-kr", "ignore")
 		self.soup = bs(self.html, "html.parser")
@@ -335,7 +325,7 @@ class Download(Process, WebProcess):
 		self.Play("down_start.wav")
 		self.q = q
 		self.filename = f
-		self.url = u
+		self.url = u if type(u) == str else u.encode("euc-kr", "ignore")
 		self.downfolder = self.ReadReg("downfolder")
 		if not self.downfolder: self.downfolder = "c:\\"
 		if not self.KbuLogin(): return
