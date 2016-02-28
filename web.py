@@ -276,7 +276,8 @@ class Upload(Process, WebProcess):
 			Utility.__init__(self)
 			WebProcess.__init__(self)
 			if not action or not title or not body: return
-			self.action = action.encode("euc-kr", "ignore")
+			if type(action) == unicode: action = action.encode("euc-kr", "ignore")
+			self.action = action 
 			self.title = title.encode("euc-kr", "ignore")
 			self.body = body.encode("euc-kr", "ignore")
 			self.q = q

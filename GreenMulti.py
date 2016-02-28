@@ -602,7 +602,7 @@ class GreenMulti(wx.Frame, WebProcess):
 
 
 	def CheckLimit(self):
-		if len(self.dProcess) < 3: return False
+		if not self.dProcess or  len(self.dProcess) < 3: return False
 		i = 0
 		for f in self.dProcess.keys():
 			if "\\" in f: continue
