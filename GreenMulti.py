@@ -610,8 +610,7 @@ class GreenMulti(wx.Frame, WebProcess):
 			if i == self.limit: return True
 		return False
 
-
-if __name__ == "__main__":
+def main():
 	app = wx.App()
 	GreenMulti(u"초록멀티 v1.5 Beta3")
 	app.MainLoop()
