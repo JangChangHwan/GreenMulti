@@ -207,9 +207,10 @@ class TransferStatus(wx.Dialog):
 		self.listctrl = wx.ListCtrl(self, -1, (5, 5), (490, 490), wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_SORT_ASCENDING)
 		self.listctrl.InsertColumn(0, '', width=50) # 퍼센트
 		self.listctrl.InsertColumn(1, '', width=50) # 전송모드 / 업, 다운
-		self.listctrl.InsertColumn(2, '', width=240) # 파일 이름
+		self.listctrl.InsertColumn(2, '', width=200) # 파일 이름
 		self.listctrl.InsertColumn(3, u'속도', width=50)
-		self.listctrl.InsertColumn(4, u'남은 시간')
+		self.listctrl.InsertColumn(4, u'남은 시간', width=50)
+		self.listctrl.InsertColumn(5, 'p_num', width=40)
 		self.listctrl.Bind(wx.EVT_KEY_DOWN, self.on_listctrl)
 
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -221,9 +222,14 @@ class TransferStatus(wx.Dialog):
 	def on_listctrl(self, e):
 		k = e.GetKeyCode()
 
-		if k == ord(' ') or k == wx.WXK_RETURN:
+		if k == ord(' '):
 			self.get_info()
 			e.Skip()
+
+		elif k == wx.WXK_RETURN:
+			d = wx.MessageDialog(self, u'현재 %s 개의 프로세스가 작업 중입니다.' % len(self.parent.dProcess), u'프로세스 현황', wx.OK)
+			d.ShowModal()
+			d.Destroy()
 
 		elif k == wx.WXK_ESCAPE:
 			self.Destroy()
@@ -236,46 +242,34 @@ class TransferStatus(wx.Dialog):
 
 
 	def cancel(self):
-		try:
-			n = self.listctrl.GetFocusedItem()
-			if n == -1: return
-			d = wx.MessageDialog(self, '다운로드를 중단할까요?', '알림', wx.OK | wx.CANCEL)
-			if d.ShowModal() == wx.ID_OK:
-				f = self.listctrl.GetItemText(n, 2)
-
-				if not f in self.parent.dProcess and f in self.parent.dTransInfo: 
-					self.parent.dTransInfo.pop(f)
-					self.get_info()
-					return
-
-				pid = self.parent.dProcess.pop(f)
+		n = self.listctrl.GetFocusedItem()
+		if n == -1: return
+		d = wx.MessageDialog(self, u'다운로드를 중단할까요?', u'알림', wx.OK | wx.CANCEL)
+		if d.ShowModal() == wx.ID_OK:
+			p_num = int(self.listctrl.GetItemText(n, 5))
+			try:
+				self.parent.dTransInfo.pop(p_num)
+			except:
+				pass
+			try:
+				pid = self.parent.dProcess.pop(p_num)
 				pid.terminate()
-				self.parent.dTransInfo.pop(f)
-				self.get_info()
-		except:
-			pass
+			except:
+				pass
+			self.get_info()
 
 
 	def get_info(self):
 		self.listctrl.DeleteAllItems()
 		if not self.parent.dTransInfo: return
 		for k, v in self.parent.dTransInfo.items():
-# 완료된 내용 삭제
-			if v[0] == 100: 
-				self.parent.dTransInfo.pop(k)
-				continue
-			k2 = k
-# 한글 포함 여부에 따라 파일 이름 정리
-			try:
-				k = unicode(k, "euc-kr", "ignore")
-			except:
-				k = k2
-			index = self.listctrl.InsertItem(sys.maxint, "%8.2f%%" % v[0])
-			self.listctrl.SetItem(index, 1, v[1])
-			self.listctrl.SetItem(index, 2, k)
-			self.listctrl.SetItem(index, 3, "%8.2fMB" % v[2])
-			self.listctrl.SetItem(index, 4, self.remaining(v[3]))
-
+			index = self.listctrl.InsertStringItem(sys.maxint, "%8.2f%%" % v[0])
+			self.listctrl.SetStringItem(index, 1, v[1])
+			filename = v[2] if type(v[2]) == unicode else unicode(v[2], "euc-kr", "ignore")
+			self.listctrl.SetStringItem(index, 2, filename)
+			self.listctrl.SetStringItem(index, 3, "%8.2fMB" % v[3])
+			self.listctrl.SetStringItem(index, 4, self.remaining(v[4]))
+			self.listctrl.SetStringItem(index, 5, str(k))
 
 	def remaining(self, t):
 		min = int(t // 60)
@@ -293,13 +287,13 @@ class QueueManager(Thread):
 		while True:
 			try:
 				if self.parent.msg == "exit": break
-				per, mode, filename, speed, remain = self.parent.ResQ.get_nowait()
-				if per < 100.0 or filename:
-					if type(filename) == str: filename = unicode(filename, "euc-kr", "ignore")
-					self.parent.dTransInfo[filename] = (per, mode, speed, remain)
+				per, mode, filename, speed, remain, p_num = self.parent.ResQ.get_nowait()
+				if per < 100: 
+					self.parent.dTransInfo[p_num] = (per, mode, filename, speed, remain)
 				else:
-					self.parent.dProcess.pop(filename)
-					self.parent.dTransInfo.pop(filename)
+					pid = self.parent.dProcess.pop(p_num, 0)
+					if pid: pid.terminate()
+					if p_num in self.parent.dTransInfo: self.parent.dTransInfo.pop(p_num)
 			except:
 				time.sleep(0.1)
 

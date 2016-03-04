@@ -1,0 +1,167 @@
+
+guide	1. 공지 및 이용안내	top	notice|oldinfo|rtguide
+notice	1. 공지사항	guide	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=notice&mo=guide&&gonum=&s_que=
+oldinfo	2. 지난공지	guide	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=oldinfo&mo=guide&&gonum=&s_que=
+rtguide	3. 마을이용안내	guide	http://web.kbuwel.or.kr/menu/index.php?mo=guide&club=main&bcode=rtguide&page=1
+
+mail	2. 전자 우편	top	rmail|wmail|cmail
+rmail	1. 받은편지함	mail	http://web.kbuwel.or.kr/menu/mail.php?page=1&cmd=list&&box=1
+wmail	2. 메일 쓰기	mail	http://web.kbuwel.or.kr/menu/mail.php?cmd=write&&box=1
+cmail	3. 보낸편지확인	mail	http://web.kbuwel.or.kr/menu/mail.php?page=1&cmd=list&&box=3
+
+bbs	3. 게시판	top	free|freeinfo|mark|story|news|agora|humor|ff|broadcast|kbu4|stress1|comma|dvsbbs|cardbbs|relibbs|prevbbs
+free	1. 자유게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free&mo=bbs&&gonum=&s_que=
+freeinfo	2. 자유공지 / 광고	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=freeinfo&mo=bbs&&gonum=&s_que=
+mark	3. 벼룩시장 / 구인, 구직	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=mark&mo=bbs&&gonum=&s_que=
+story	4. 이야기 벤치	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=story&mo=bbs&&gonum=&s_que=
+
+news	5. 뉴스 광장	bbs	news1|news2|news3|news4|news5|news6|news7|news8|news9|welbbs|allnews
+news1	1. 속보	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news1&mo=news&&gonum=&s_que=
+news2	2. 정치	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news2&mo=news&&gonum=&s_que=
+news3	3. 경제	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news3&mo=news&&gonum=&s_que=
+news4	4. 사회	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news4&mo=news&&gonum=&s_que=
+news5	5. 생활 / 문화	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news5&mo=news&&gonum=&s_que=
+news6	6. 세계	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news6&mo=news&&gonum=&s_que=
+news7	7. I T / 과학	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news7&mo=news&&gonum=&s_que=
+news8	8. 연예	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news8&mo=news&&gonum=&s_que=
+news9	9. 스포츠	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=news9&mo=news&&gonum=&s_que=
+welbbs	10. 복지통신	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=welbbs&mo=news&&gonum=&s_que=
+allnews	12. 전체뉴스 보기	news	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=allnews&mo=news&&gonum=&s_que=
+
+agora	6. 아고라 토론	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=agora&mo=bbs&&gonum=&s_que=
+humor	7. 유머 / 공포 / 황당	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=humor&mo=bbs&&gonum=&s_que=
+ff	8. 가입인사 / 초보 연습	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=ff&mo=bbs&&gonum=&s_que=
+broadcast	9. 화면해설방송 게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=broadcast&mo=bbs&&gonum=&s_que=
+kbu4	10. 녹음도서목록	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=kbu4&mo=bbs&&gonum=&s_que=
+stress1	12. 속상한 것 털어 놓는 방	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=stress1&mo=bbs&&gonum=&s_que=
+comma	13. 쉼표가 찍힌 일상	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=comma&mo=bbs&&gonum=&s_que=
+dvsbbs	14. 화면해설방송수신기 불편 신고 게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&mo=bbs&club=main&bcode=dvsbbs
+cardbbs	15. 의약품 부작용 불편 신고 게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&mo=bbs&club=main&bcode=cardbbs
+relibbs	16. 종교게시판	bbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=relibbs&mo=bbs&&gonum=&s_que=
+prevbbs	17. 이전 자유게시판	bbs	free2014|free2011|free2006|free2003
+free2014	1. 2014년 이전 자유게시판	prevbbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free2014&mo=freebbs&&gonum=&s_que=
+free2011	2. 2011년 이전 자유게시판	prevbbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free2011&mo=freebbs&&gonum=&s_que=
+free2006	3. 2007년 이전 자유게시판	prevbbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free2006&mo=freebbs&&gonum=&s_que=
+free2003	4. 2004년 이전 자유게시판	prevbbs	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=free2003&mo=freebbs&&gonum=&s_que=
+
+computer	4. 컴퓨터	top	cominfo|comqna|com119|comlec|prg|skt
+cominfo	1. 컴소식	computer	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=cominfo&mo=computer&&gonum=&s_que=
+comqna	2. 물어보세요	computer	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=comqna&mo=computer&&gonum=&s_que=
+
+com119	3. 컴퓨터 119	computer	com119info|com119free|com119lec|com119pds
+com119info	1. 공지사항	computer	http://web.kbuwel.or.kr/menu/index.php?page=1&club=com119&bcode=com119info&mo=com119&&gonum=&s_que=
+com119free	2. 자유게시판	computer	http://web.kbuwel.or.kr/menu/index.php?page=1&club=com119&bcode=com119free&mo=com119&&gonum=&s_que=
+com119lec	3. 컴퓨터 강의실	computer	http://web.kbuwel.or.kr/menu/index.php?page=1&club=com119&bcode=com119lec&mo=com119&&gonum=&s_que=
+com119pds	4. 자료실	computer	http://web.kbuwel.or.kr/menu/index.php?page=1&club=com119&bcode=com119pds&mo=com119&&gonum=&s_que=
+comlec	4. 강좌 / 메뉴얼	computer	mcom|comlecetcb
+mcom	1. 음성 / 동영상 강좌	comlec	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=mcom&mo=comlec&&gonum=&s_que=
+comlecetcb	2. 문서 강좌 / 메뉴얼	comlec	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=comlecetcb&mo=comlec&&gonum=&s_que=
+
+prg	5. 개발자와 함께	computer	hims|xvsrd
+
+hims	1. 자원 메디칼(구 힘스인터내셔널)	prg	himsinfo|himsintro|himsproduc|himsfree|himsqna|himsqna2|himsfaq|himsstudy1|himspds1
+himsinfo	1. 공지사항	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsinfo&mo=hims&&gonum=&s_que=
+himsintro	2. 회사소개	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsintro&mo=hims&&gonum=&s_que=
+himsproduc	3. 제품소개	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsproduc&mo=hims&&gonum=&s_que=
+himsfree	4. 게시판	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsfree&mo=hims&&gonum=&s_que=
+himsqna	5. 한소네 묻고 답하기	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsqna&mo=hims&&gonum=&s_que=
+himsqna2	6. 책마루 묻고 답하기	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsqna2&mo=hims&&gonum=&s_que=
+himsfaq	7. 자주 묻는 질문과 답변	hims	himsfaq1|himsfaq2|himsfaq3
+himsfaq1	1. 한소네 제품	himsfaq	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsfaq1&mo=himsfaq&&gonum=&s_que=
+himsfaq2	2. 책마루 제품	himsfaq	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsfaq2&mo=himsfaq&&gonum=&s_que=
+himsfaq3	3. 확대기 제품	himsfaq	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsfaq3&mo=himsfaq&&gonum=&s_que=
+himsstudy1	8. 강의실	hims	himslect1|himslect2|himslect3|himslect4|himslect5|himslect6|himslect7|himslect8|himslect9
+himslect1	1. 한소네 1 강좌	himsstudy1	himslect2
+himslect2	2. 한소네 2 강좌	himsstudy1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himslect2&mo=himsstudy1&&gonum=&s_que=
+himslect3	3. 한소네 LX 강좌	himsstudy1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himslect3&mo=himsstudy1&&gonum=&s_que=
+himslect4	4. 한소네 QX 강좌	himsstudy1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himslect4&mo=himsstudy1&&gonum=&s_que=
+himslect5	5. 한소네 보이스 강좌	himsstudy1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himslect5&mo=himsstudy1&&gonum=&s_que=
+himslect6	6. 책마루 강좌	himsstudy1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himslect6&mo=himsstudy1&&gonum=&s_que=
+himslect7	7. 책마루 2 OCR EZ	himsstudy1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himslect7&mo=himsstudy1&&gonum=&s_que=
+himslect8	8. 책마루 2 OCR ET	himsstudy1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himslect8&mo=himsstudy1&&gonum=&s_que=
+himslect9	9. 기타자료실	himsstudy1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himslect9&mo=himsstudy1&&gonum=&s_que=
+himspds1	9. 자료실	hims	h100|h200|h332b|h332q|h318b|v400|v400q|h432b|h432q|h418b|booksense|blaze|himsetc|himsuser|himspost
+h100	1. 한소네 1	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=h100&mo=himspds1&&gonum=&s_que=
+h200	2. 한소네 2	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=h200&mo=himspds1&&gonum=&s_que=
+h332b	3. 한소네 LX	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=h332b&mo=himspds1&&gonum=&s_que=
+h332q	4. 한소네 QX	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=h332q&mo=himspds1&&gonum=&s_que=
+h318b	5. 한소네 포켓	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=h318b&mo=himspds1&&gonum=&s_que=
+v400	6. 한소네 보이스	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=v400&mo=himspds1&&gonum=&s_que=
+v400q	7. 한소네 보이스 QWERTY	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=v400q&mo=himspds1&&gonum=&s_que=
+h432b	8. 한소네 U2	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=h432b&mo=himspds1&&gonum=&s_que=
+h432q	9. 한소네 U2 QWERTY	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=h432q&mo=himspds1&&gonum=&s_que=
+h418b	10. 한소네 U2 미니	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=h418b&mo=himspds1&&gonum=&s_que=
+booksense	11. 책마루 XT	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=booksense&mo=himspds1&&gonum=&s_que=
+blaze	12. 책마루 2 OCR	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=blaze&mo=himspds1&&gonum=&s_que=
+himsetc	13. 기타자료	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsetc&mo=himspds1&&gonum=&s_que=
+himsuser	14. 사용자 자료실	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsuser&mo=himspds1&&gonum=&s_que=
+himspost	15. 제품 사용 수기	himspds1	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himspost&mo=himspds1&&gonum=&s_que=
+
+
+xvsrd	2. Sense Reader 엑스비전	prg	xvinfo|xvfree|xvgame|xvqna|xvqna1|xvmsrd|xvfaq|xvtutor|xvpds|xvhope
+xvinfo	1. 공지사항	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvinfo
+xvfree	2. 자유게시판	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvfree
+xvgame	3. 게임게시판	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvgame
+xvqna	4. Sense Reader 묻고답하기	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvqna
+xvqna1	5. 브레일노트 묻고답하기	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvqna1
+xvmsrd	6. 모바일센스 묻고답하기	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvmsrd
+xvfaq	7. 자주 묻는 질문과 답변	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvfaq
+
+xvtutor	8. 강의실	xvsrd	xvtutor1|xvtutor2|xvtutor3|xvtutor4|xvtutor8|xvtutor5|xvtutor6|xvtutor11|xvtutor9|xvtutor10|7|xvtutorall
+xvtutor1	1. 운영체제	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor1
+xvtutor2	2. 응용프로그램	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor2
+xvtutor3	3. 통신및인터넷	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor3
+xvtutor4	4. power edition office	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor4
+xvtutor8	5. professional office	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor8
+xvtutor5	6. SenseReader기본강좌	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor5
+xvtutor6	7. SenseReader활용팁	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor6
+xvtutor11	8. 센스월드 강의실	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor11
+xvtutor9	9. 게임 강의실	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor9
+xvtutor10	10. 모바일 센스 강의실	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor10
+xvtutor7	11. BrailleNote 강의	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutor7
+xvtutorall	12. 전체자료실	xvtutor	http://web.kbuwel.or.kr/menu/?mo=xvtutor&club=main&bcode=xvtutorall
+
+xvpds	9. 자료실	xvsrd	xvpds1|xvpds2|xvpds3|xvpds4|xvpds5|xvpds6|xvpdsall
+xvpds1	1. SenseReader자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds1
+xvpds2	2. 일반자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds2
+xvpds3	3. BrailleNote 관련 자료	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds3
+xvpds4	4. 게임 자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds4
+xvpds5	5. 게임사용자 자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds5
+xvpds6	6. 모바일센스자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpds6
+xvpdsall	7. 전체자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpdsall
+xvhope	10. Xvision Technology에게 바란다	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvhope
+
+skt	6. SK 행복을 들려주는 도서관	computer	skt1|skt2|skt3|skt4
+skt1	1. 공지사항	skt	http://web.kbuwel.or.kr/menu/index.php?page=1&club=skt&bcode=skt1&mo=skt&&gonum=&s_que=
+skt2	2. 묻고 답하기	skt	http://web.kbuwel.or.kr/menu/index.php?page=1&club=skt&bcode=skt2&mo=skt&&gonum=&s_que=
+skt3	3. 자료실	skt	http://web.kbuwel.or.kr/menu/index.php?page=1&club=skt&bcode=skt3&mo=skt&&gonum=&s_que=
+skt4	4. 행복이벤트 참여 게시판	skt	http://web.kbuwel.or.kr/menu/index.php?page=1&club=skt&bcode=skt4&mo=skt&&gonum=&s_que=
+
+potion	5. 동호회 모음	top	circle|classmate|religion
+
+circle	1. 일반 동호회	potion	comto
+
+comto	43. 컴토피아	circle	comton|comtof|comtod|comtol|comtoq|comtoj|comtor
+comton	1. 공지사항	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comton
+comtof	2. 자유게시판	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtof
+
+comtod	3. 자료실	comto	comtod1|comtod2|comtod3|comtod4|comtod5|comtod6|comtod7|comtod8|comtod9|comtod10|comtod99
+comtod1	1. 운영체제	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod1
+comtod2	2. 드라이버	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod2
+comtod3	3. 스크린리더 / 점자 / TTS	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod3
+comtod4	4. 문서 / 오피스	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod4
+comtod5	5. 유틸리티	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod5
+comtod6	6. 유틸리티	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod6
+comtod7	7. 백업 / 복구	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod7
+comtod8	8. 포터블	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod8
+comtod9	9. 토렌트	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod9
+comtod10	10. 기타	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod10
+comtod99	11. 전체자료실	comtod	http://web.kbuwel.or.kr/menu/?page=1&club=comto&bcode=comtod99&mo=comtod&&gonum=&s_que=
+
+comtol	5. 강의실	comto	comtol1|comtol2
+comtol1	1. 음성 / 동영상 강의	comtol	http://web.kbuwel.or.kr/menu/?mo=comtol&club=comto&bcode=comtol1
+comtol2	2. 문서 강의	comtol	http://web.kbuwel.or.kr/menu/?mo=comtol&club=comto&bcode=comtol2
+
+comtoq	5. 질문과 답변	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtoq
+comtoj	6. 운영 참여	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtoj
+comtor	8. 휴지통	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtor

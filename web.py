@@ -270,7 +270,7 @@ class WebProcess(Utility):
 
 
 class Upload(Process, WebProcess):
-	def __init__(self, action, title, body, file, q):
+	def __init__(self, action, title, body, file, p_num, q):
 		try:
 			Process.__init__(self)
 			Utility.__init__(self)
@@ -281,6 +281,7 @@ class Upload(Process, WebProcess):
 			self.title = title.encode("euc-kr", "ignore")
 			self.body = body.encode("euc-kr", "ignore")
 			self.q = q
+			self.p_num = p_num
 			if file and os.path.exists(file): 
 				self.file = file.encode("euc-kr", "ignore")
 			else:
@@ -310,27 +311,32 @@ class Upload(Process, WebProcess):
 			data["up_file1"] = open(self.file, "rb")
 			file = self.file if type(self.file) == unicode else unicode(self.file, "euc-kr", "ignore")
 
-		if file: self.q.put((0, u"업로드 중", file, 0, 0))
+		if file: self.q.put((0, u"업로드 중", file, 0, 0, self.p_num))
 		self.Post(host, data)
-		if file: self.q.put((100, u"업로드 완료", file, 0, 0))
 		self.Play("up.wav", async=False)
+		if file: self.q.put((100, u"업로드 완료", file, 0, 0, self.p_num))
 
+		while True:
+			time.sleep(1)
 
 
 class Download(Process, WebProcess):
-	def __init__(self, f, u, q):
+	def __init__(self, f, u, p_num, q):
 		Process.__init__(self)
 		Utility.__init__(self)
 		WebProcess.__init__(self)
 
-		self.Play("down_start.wav")
+		self.Play("down_start.wav", async=False)
 		self.q = q
 		self.filename = f
 		self.url = u if type(u) == str else u.encode("euc-kr", "ignore")
 		self.downfolder = self.ReadReg("downfolder")
 		if not self.downfolder: self.downfolder = "c:\\"
+		self.p_num = p_num
 		if not self.KbuLogin(): return
 		self.run()
+		while True:
+			time.sleep(1)
 
 	def KbuLogin(self):
 		try:
@@ -358,29 +364,36 @@ class Download(Process, WebProcess):
 		if not os.path.exists(filepath) or os.path.getsize(filepath) != file_size:
 			fp = open(filepath, "wb")
 			file = self.filename if type(self.filename) == unicode else unicode(self.filename, "euc-kr", "ignore")
-			self.q.put((0, u"다운로드 중", file, 0, 0)) # (up/down, filename, speed, remain)
+			self.q.put((0, u"다운로드 중", file, 0, 0, self.p_num)) 
 			while True:
 				buffer = res.read(block_size)
 				if not buffer: break
 				down_size += len(buffer)
 				fp.write(buffer)
 				per = down_size * 100.0 / file_size
+				if per == 100: break
 				t = time.time() - start_time
+				if t <= 0: continue
 				speed = down_size / t / 1024 / 1024
 				remain = t * file_size / down_size
-				self.q.put((per, u"다운로드 중", file, speed, remain))
+				self.q.put((per, u"다운로드 중", file, speed, remain, self.p_num))
 # 다운완료라면
 			fp.close()
-			self.q.put((100.0, u"다운로드 완료", file, 0, 0))
-		self.Play("down.wav", async=False)
+			self.Play("down.wav", async=False)
+			self.q.put((100.0, u"다운로드 완료", file, 0, 0, self.p_num))
+		else:
+			self.Play("down.wav", async=False)
+			self.q.put((100.0, u"다운로드 완료", u"파일이름", 0, 0, self.p_num))
+
 
 
 class SendMail(Process, WebProcess):
-	def __init__(self, q, receiver, coreceiver, title, body, file1, file2, file3):
+	def __init__(self, receiver, coreceiver, title, body, file1, file2, file3, p_num, q):
 #		try:
 			Process.__init__(self)
 			Utility.__init__(self)
 			WebProcess.__init__(self)
+			self.p_num = p_num
 			self.action = u"http://web.kbuwel.or.kr/menu/mail.php?cmd=send&".encode("euc-kr", "ignore")
 			self.receiver = receiver.encode("euc-kr", "ignore")
 			self.coreceiver = coreceiver.encode("euc-kr", "ignore") if coreceiver else ""
@@ -432,8 +445,9 @@ class SendMail(Process, WebProcess):
 			file = self.file1 + "|" + self.file2 + "|" + self.file3
 		if type(file) == str: file = unicode(file, "euc-kr", "ignore")
 
-		if file: self.q.put((0, u"업로드 중", file, 0, 0))
+		if file: self.q.put((0, u"업로드 중", file, 0, 0, self.p_num))
 		self.Post(host, data)
-		if file: self.q.put((100, u"업로드 완료", file, 0, 0))
 		self.Play("up.wav", async=False)
-
+		if file: self.q.put((100, u"업로드 완료", file, 0, 0, self.p_num))
+		while True:
+			time.sleep(1)

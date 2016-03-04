@@ -8,7 +8,7 @@ import winsound
 import os
 import wx
 from bs4 import BeautifulSoup as bs
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, freeze_support
 from threading import Thread
 import time
 import subprocess
@@ -26,6 +26,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		self.dProcess = {}
 		self.dTransInfo = {}
 		self.msg = ""
+		self.p_num = 0
 # Queue 관리자를 실행
 		self.th = Thread(target=QueueManager, args=(self,))
 		self.th.start()
@@ -35,44 +36,44 @@ class GreenMulti(wx.Frame, WebProcess):
 		menubar = wx.MenuBar()
 		file_menu = wx.Menu()
 		help_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"도움말\tF1")
-		file_menu.Append(help_mi)
+		file_menu.AppendItem(help_mi)
 		self.Bind(wx.EVT_MENU, self.OnHelp, help_mi)
 		home_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"홈으로 이동\tAlt+Home")
-		file_menu.Append(home_mi)
+		file_menu.AppendItem(home_mi)
 		self.Bind(wx.EVT_MENU, self.OnComeBackHome, home_mi)
 		find_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"검색\tCtrl+F")
-		file_menu.Append(find_mi)
+		file_menu.AppendItem(find_mi)
 		self.Bind(wx.EVT_MENU, self.OnFind, find_mi)
 		direct_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"코드 바로가기\tCtrl+G")
-		file_menu.Append(direct_mi)
+		file_menu.AppendItem(direct_mi)
 		self.Bind(wx.EVT_MENU, self.OnDirectMove, direct_mi)
 		status_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"파일 전송 정보\tCtrl+J")
-		file_menu.Append(status_mi)
+		file_menu.AppendItem(status_mi)
 		self.Bind(wx.EVT_MENU, self.OnTransferStatus, status_mi)
 		opendir_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"다운로드 폴더 열기\tCtrl+O")
-		file_menu.Append(opendir_mi)
+		file_menu.AppendItem(opendir_mi)
 		self.Bind(wx.EVT_MENU, self.OnOpenDownFolder, opendir_mi)
 		chdir_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"다운로드 폴더 변경")
-		file_menu.Append(chdir_mi)
+		file_menu.AppendItem(chdir_mi)
 		self.Bind(wx.EVT_MENU, self.OnChangeDownFolder, chdir_mi)
 		init_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"설정 초기화")
-		file_menu.Append(init_mi)
+		file_menu.AppendItem(init_mi)
 		self.Bind(wx.EVT_MENU, self.OnInitialize, init_mi)
-		quit_mi = wx.MenuItem(file_menu, wx.ID_ANY, '종료(&X)\tAlt+F4)')
-		file_menu.Append(quit_mi)
+		quit_mi = wx.MenuItem(file_menu, wx.ID_ANY, u'종료(&X)\tAlt+F4)')
+		file_menu.AppendItem(quit_mi)
 		self.Bind(wx.EVT_MENU, self.OnClose, quit_mi)
 
-		menubar.Append(file_menu, '넓은마을(&K)')
+		menubar.Append(file_menu, u'파일(&F)')
 		self.SetMenuBar(menubar)
 
 
 		panel = wx.Panel(self, -1)
 		panel.SetAutoLayout(True)
 
-		lbl_listctrl = wx.StaticText(panel, -1, '메뉴 및 게시물 목록', (5, 5), (500, 20))
+		lbl_listctrl = wx.StaticText(panel, -1, u'메뉴, 게시물', (5, 5), (500, 20))
 		self.listctrl = wx.ListCtrl(panel, -1, (5, 30), (500, 375), wx.LC_REPORT | wx.LC_SINGLE_SEL)
 		self.listctrl.InsertColumn(0, '', width=400)
-		self.listctrl.InsertColumn(1, '작성자', width=100)
+		self.listctrl.InsertColumn(1, u'작성자', width=100)
 		self.listctrl.Bind(wx.EVT_KEY_DOWN, self.listctrl_KeyDown)
 #		self.listctrl.Bind(wx.EVT_RIGHT_DOWN, self.on_listctrl1_right_down)
 
@@ -134,23 +135,25 @@ class GreenMulti(wx.Frame, WebProcess):
 	def OnClose(self, e):
 		self.Play("end.wav")
 		self.msg = "exit"
-		time.sleep(0.5)
+		time.sleep(1)
 		self.th.join()
-		if self.dProcess:
+		self.OnAllKill(e)
+		self.Destroy()
+
+	def OnAllKill(self, e):
+		if self.dProcess: 
 			for k, v in self.dProcess.items():
 				try:
 					v.terminate()
 				except:
 					pass
-		self.Destroy()
-
 
 	def DisplayItems(self, mode):
 		if mode == "menu" or mode == "list":
 			self.listctrl.DeleteAllItems()
 			for t in self.lItemList:
-				index = self.listctrl.InsertItem(sys.maxint, t[1])
-				self.listctrl.SetItem(index, 1, t[2])
+				index = self.listctrl.InsertStringItem(sys.maxint, t[1])
+				self.listctrl.SetStringItem(index, 1, t[2])
 		elif mode == "view":
 			text = self.ViewInfo["content"]
 			text = text.replace("\r", "")
@@ -421,17 +424,17 @@ class GreenMulti(wx.Frame, WebProcess):
 		soup = bs(unicode(html, "euc-kr", "ignore"), "html.parser")
 		wd = WriteDialog(self, u"게시물 쓰기", soup)
 		if wd.ShowModal() == wx.ID_OK:
+			self.p_num += 1
 			action = wd.action
 			title = wd.textctrl1.GetValue()
 			body = wd.textctrl2.GetValue()
 			file = wd.attach
 			wd.Destroy()
 			if not title or not body: return self.MsgBox(u"오류", u"게시물 제목과 본문 내용은 필수 입력사항입니다. 게시물을 올릴 수 없습니다.")
-			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.ResQ))
+			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.p_num, self.ResQ))
 			p.start()
 			if file: 
-				filename = file if type(file) == unicode else unicode(file, "euc-kr", "ignore")
-				self.dProcess[filename] = p
+				self.dProcess[self.p_num] = p
 
 		else:
 			wd.Destroy()
@@ -449,9 +452,8 @@ class GreenMulti(wx.Frame, WebProcess):
 			file = wd.attach
 			wd.Destroy()
 			if not title or not body: return self.MsgBox(u"오류", u"게시물 제목과 본문 내용은 필수 입력사항입니다. 게시물을 올릴 수 없습니다.")
-			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.ResQ))
+			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.p_num, self.ResQ))
 			p.start()
-#			if file: self.dProcess[file] = p
 		else:
 			wd.Destroy()
 
@@ -475,10 +477,10 @@ class GreenMulti(wx.Frame, WebProcess):
 			return self.MsgBox(u"동시 다운로드 제한", u"동시 다운로드 제한을 넘어서 다운로드 할 수 없습니다. 잠시 후 다시 다운로드해 주세요.")
 
 		for f, u in d.items():
-			p = Process(target=Download, args=(f, u, self.ResQ))
+			self.p_num += 1
+			p = Process(target=Download, args=(f, u, self.p_num, self.ResQ))
 			p.start()
-			filename = f if type(f) == unicode else unicode(f, "euc-kr", "ignore")
-			self.dProcess[filename] = p
+			self.dProcess[self.p_num] = p
 			
 
 	def OnTransferStatus(self, e):
@@ -581,14 +583,11 @@ class GreenMulti(wx.Frame, WebProcess):
 			file3 = wd.attach3
 			wd.Destroy()
 			if not receiver or not title or not body: return self.MsgBox(u"오류", u"받는 사람, 제목, 본문 내용은 필수 입력사항입니다. 메일을 전송할 수 없습니다.")
-
-			p = Process(target=SendMail, args=(self.ResQ, receiver, coreceiver, title, body, file1, file2, file3))
+			self.p_num += 1
+			p = Process(target=SendMail, args=(receiver, coreceiver, title, body, file1, file2, file3, self.p_num, self.ResQ))
 			p.start()
-			filename = ""
 			if file1 or file2 or file3: 
-				filename = self.dProcess[file1 + "|" + file2 +"|" + file3] = p
-				if type(filename) == str: filename = unicode(filename, "euc-kr", "ignore")
-				self.dProcess[filename] = p
+				self.dProcess[self.p_num] = p
 
 		else:
 			wd.Destroy()
@@ -602,11 +601,14 @@ class GreenMulti(wx.Frame, WebProcess):
 
 
 	def CheckLimit(self):
-		if not self.dProcess or  len(self.dProcess) < 3: return False
-		i = 0
-		for f in self.dProcess.keys():
-			if "\\" in f: continue
-			i += 1
-			if i == self.limit: return True
-		return False
+		if not self.dProcess or  len(self.dProcess) < self.limit: 
+			return False
+		else:
+			return True
 
+
+if __name__ == "__main__":
+	freeze_support()
+	app = wx.App()
+	f = GreenMulti(u"초록멀티 v1.5 베타4")
+	app.MainLoop()
