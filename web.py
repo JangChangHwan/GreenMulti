@@ -271,7 +271,7 @@ class WebProcess(Utility):
 
 class Upload(Process, WebProcess):
 	def __init__(self, action, title, body, file, p_num, q):
-		try:
+#		try:
 			Process.__init__(self)
 			Utility.__init__(self)
 			WebProcess.__init__(self)
@@ -282,14 +282,15 @@ class Upload(Process, WebProcess):
 			self.body = body.encode("euc-kr", "ignore")
 			self.q = q
 			self.p_num = p_num
-			if file and os.path.exists(file): 
-				self.file = file.encode("euc-kr", "ignore")
-			else:
-				self.file = ""
+			self.file = file if type(file) == str else file.encode("euc-kr", "ignore")
+
 			if not self.KbuLogin(): return
 			self.run()
-		except:
-			self.Play("error.wav", async=False)
+			while True:
+				time.sleep(1)
+
+#		except:
+#			self.Play("error.wav", async=False)
 
 	def KbuLogin(self):
 		try:
@@ -309,6 +310,7 @@ class Upload(Process, WebProcess):
 		file = ""
 		if self.file: 
 			data["up_file1"] = open(self.file, "rb")
+
 			file = self.file if type(self.file) == unicode else unicode(self.file, "euc-kr", "ignore")
 
 		if file: self.q.put((0, u"업로드 중", file, 0, 0, self.p_num))
@@ -316,8 +318,6 @@ class Upload(Process, WebProcess):
 		self.Play("up.wav", async=False)
 		if file: self.q.put((100, u"업로드 완료", file, 0, 0, self.p_num))
 
-		while True:
-			time.sleep(1)
 
 
 class Download(Process, WebProcess):

@@ -365,7 +365,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		elif k == wx.WXK_RETURN:
 #			try:
 				n = self.textctrl2.GetInsertionPoint()
-				b, x, y = self.textctrl2.PositionToXY(n)
+				x, y = self.textctrl2.PositionToXY(n)
 				l = self.textctrl2.GetLineText(y)
 				m = re.match(u'^\\d+ 번 리플삭제', l)
 				if not l or m is None: return

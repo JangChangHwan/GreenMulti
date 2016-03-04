@@ -69,9 +69,9 @@ class Utility():
 	def Play(self, wavfile, async=True):
 		try:
 			if async:
-				winsound.PlaySound(os.path.dirname(__file__) + "\\sound\\" + wavfile, winsound.SND_ASYNC)
+				winsound.PlaySound(os.path.dirname(sys.argv[0]) + "\\sound\\" + wavfile, winsound.SND_ASYNC)
 			else:
-				winsound.PlaySound(os.path.dirname(__file__) + "\\sound\\" + wavfile, winsound.SND_NOSTOP)
+				winsound.PlaySound(os.path.dirname(sys.argv[0]) + "\\sound\\" + wavfile, winsound.SND_NOSTOP)
 		except:
 			pass
 
