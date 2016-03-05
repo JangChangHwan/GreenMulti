@@ -11,6 +11,7 @@ import os
 import sys
 import winsound
 import time
+import mmap
 
 
 class WebProcess(Utility):
@@ -271,7 +272,7 @@ class WebProcess(Utility):
 
 class Upload(Process, WebProcess):
 	def __init__(self, action, title, body, file, p_num, q):
-#		try:
+		try:
 			Process.__init__(self)
 			Utility.__init__(self)
 			WebProcess.__init__(self)
@@ -286,8 +287,9 @@ class Upload(Process, WebProcess):
 
 			if not self.KbuLogin(): return
 			self.run()
-			while True:
-				time.sleep(1)
+		except:
+			pass
+
 
 #		except:
 #			self.Play("error.wav", async=False)
@@ -317,6 +319,8 @@ class Upload(Process, WebProcess):
 		self.Post(host, data)
 		self.Play("up.wav", async=False)
 		if file: self.q.put((100, u"업로드 완료", file, 0, 0, self.p_num))
+		while True:
+			time.sleep(1)
 
 
 
@@ -326,17 +330,19 @@ class Download(Process, WebProcess):
 		Utility.__init__(self)
 		WebProcess.__init__(self)
 
-		self.Play("down_start.wav", async=False)
-		self.q = q
-		self.filename = f
-		self.url = u if type(u) == str else u.encode("euc-kr", "ignore")
-		self.downfolder = self.ReadReg("downfolder")
-		if not self.downfolder: self.downfolder = "c:\\"
-		self.p_num = p_num
-		if not self.KbuLogin(): return
-		self.run()
-		while True:
-			time.sleep(1)
+		try:
+			self.Play("down_start.wav", async=False)
+			self.q = q
+			self.filename = f
+			self.url = u if type(u) == str else u.encode("euc-kr", "ignore")
+			self.downfolder = self.ReadReg("downfolder")
+			if not self.downfolder: self.downfolder = "c:\\"
+			self.p_num = p_num
+			if not self.KbuLogin(): return
+			self.run()
+		except:
+			pass
+
 
 	def KbuLogin(self):
 		try:
@@ -384,12 +390,14 @@ class Download(Process, WebProcess):
 		else:
 			self.Play("down.wav", async=False)
 			self.q.put((100.0, u"다운로드 완료", u"파일이름", 0, 0, self.p_num))
+		while True:
+			time.sleep(1)
 
 
 
 class SendMail(Process, WebProcess):
 	def __init__(self, receiver, coreceiver, title, body, file1, file2, file3, p_num, q):
-#		try:
+		try:
 			Process.__init__(self)
 			Utility.__init__(self)
 			WebProcess.__init__(self)
@@ -415,8 +423,8 @@ class SendMail(Process, WebProcess):
 
 			if not self.KbuLogin(): return
 			self.run()
-#		except:
-#			self.Play("error.wav", async=False)
+		except:
+			self.Play("error.wav", async=False)
 
 	def KbuLogin(self):
 		try:

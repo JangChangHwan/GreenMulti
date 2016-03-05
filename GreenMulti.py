@@ -13,7 +13,7 @@ from threading import Thread
 import time
 import subprocess
 
-if time.time() > 1459313863: sys.exit()
+if time.time() > 1457148027 + (86400 * 26): sys.exit()
 
 class GreenMulti(wx.Frame, WebProcess):
 	def __init__(self, title):
@@ -101,7 +101,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		self.DisplayItems("menu")
 
 	def KbuLogin(self):
-#		try:
+		try:
 			kbuid = self.Decrypt(self.ReadReg('kbuid'))
 			if not kbuid: kbuid = self.InputBox(u'넓은마을 로그인', u'아이디')
 			kbupw = self.Decrypt(self.ReadReg('kbupw'))
@@ -127,26 +127,37 @@ class GreenMulti(wx.Frame, WebProcess):
 				foruser = Thread(target=ForUser, args=(self,))
 				foruser.start()
 
-#		except:
-#			pass
+		except:
+			pass
 
 
 
 	def OnClose(self, e):
-		self.Play("end.wav")
-		self.msg = "exit"
-		time.sleep(1)
-		self.th.join()
-		self.OnAllKill(e)
-		self.Destroy()
+		try:
+			if self.dProcess: 
+				if not self.MsgBox(u"경고", u"파일 전송이 완료되지 않았습니다. 그래도 종료하시겠습니까?", question=True): 
+					return
+
+			self.Play("end.wav")
+			self.msg = "exit"
+			time.sleep(1)
+			self.th.join()
+			self.OnAllKill(e)
+			self.Destroy()
+		except:
+			sys.exit()
 
 	def OnAllKill(self, e):
-		if self.dProcess: 
-			for k, v in self.dProcess.items():
-				try:
-					v.terminate()
-				except:
-					pass
+		try:
+			if self.dProcess: 
+				for k, v in self.dProcess.items():
+					try:
+						v.terminate()
+					except:
+						pass
+		except:
+			pass
+
 
 	def DisplayItems(self, mode):
 		if mode == "menu" or mode == "list":
@@ -162,8 +173,13 @@ class GreenMulti(wx.Frame, WebProcess):
 			self.textctrl2.SetValue(self.ViewInfo["replies"])
 			self.textctrl3.Clear()
 
-
 	def listctrl_KeyDown(self, e):
+		try:
+			self.try_listctrl_KeyDown(e)
+		except:
+			pass
+
+	def try_listctrl_KeyDown(self, e):
 		k = e.GetKeyCode()
 
 		if k == wx.WXK_UP:
@@ -195,7 +211,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		elif (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT) or k == wx.WXK_ESCAPE or k == 8:
 			parent = self.dTreeMenu[self.bcode][1]
 			if not parent: 
-				self.Play("beep.wav")
+				self.Play("home.wav")
 				return
 
 			self.ListInfo.clear()
@@ -288,28 +304,36 @@ class GreenMulti(wx.Frame, WebProcess):
 
 
 	def InputBox(self, title, text, pwd=False):
-		style = wx.OK | wx.CANCEL | wx.TE_PASSWORD if pwd else wx.OK | wx.CANCEL
-		entry = wx.TextEntryDialog(self, text, title, '', style)
-		if entry.ShowModal() == wx.ID_OK: return entry.GetValue()
-		entry.Destroy()
-
+		try:
+			style = wx.OK | wx.CANCEL | wx.TE_PASSWORD if pwd else wx.OK | wx.CANCEL
+			entry = wx.TextEntryDialog(self, text, title, '', style)
+			if entry.ShowModal() == wx.ID_OK: return entry.GetValue()
+			entry.Destroy()
+		except:
+			pass
 
 	def MsgBox(self, title, text, question=False):
-		if question:
-			d = wx.MessageDialog(self, text, title, wx.OK | wx.CANCEL)
-			if d.ShowModal() == wx.ID_OK:
-				return True
+		try:
+			if question:
+				d = wx.MessageDialog(self, text, title, wx.OK | wx.CANCEL)
+				if d.ShowModal() == wx.ID_OK:
+					return True
+				else:
+					return False
+				d.Destroy()
 			else:
-				return False
-			d.Destroy()
-
-		else:
-			d = wx.MessageDialog(self, text, title, wx.OK)
-			d.ShowModal()
-			d.Destroy()
-
-
+				d = wx.MessageDialog(self, text, title, wx.OK)
+				d.ShowModal()
+				d.Destroy()
+		except:
+			pass
 	def OnTextCtrl1KeyDown(self, e):
+		try:
+			self.try_OnTextCtrl1KeyDown(e)
+		except:
+			pass
+
+	def try_OnTextCtrl1KeyDown(self, e):
 		k = e.GetKeyCode()
 
 		if k == wx.WXK_ESCAPE or (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT) or k == 8:
@@ -339,8 +363,13 @@ class GreenMulti(wx.Frame, WebProcess):
 
 		else:
 			e.Skip()
-
 	def OnTextCtrl2KeyDown(self, e):
+		try:
+			self.try_OnTextCtrl2KeyDown(e)
+		except:
+			pass
+
+	def try_OnTextCtrl2KeyDown(self, e):
 		k = e.GetKeyCode()
 		if k == wx.WXK_ESCAPE or (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT):
 			self.listctrl.SetFocus()
@@ -388,22 +417,31 @@ class GreenMulti(wx.Frame, WebProcess):
 	def OnTextCtrl3KeyDown(self, e):
 		k = e.GetKeyCode()
 		if k == wx.WXK_ESCAPE or (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT):
-			self.listctrl.SetFocus()
-			self.Play("back.wav")
+			try:
+				self.listctrl.SetFocus()
+				self.Play("back.wav")
+			except:
+				pass
+
 		else:
 			e.Skip()
+
 
 	def OnRepleKeyDown(self, e):
 		k = e.GetKeyCode()
 		if k == wx.WXK_ESCAPE or (e.GetModifiers() == wx.MOD_ALT and k == wx.WXK_LEFT):
-			self.listctrl.SetFocus()
-			self.Play("back.wav")
+			try:
+				self.listctrl.SetFocus()
+				self.Play("back.wav")
+			except:
+				pass
+
 		else:
 			e.Skip()
 
 
 	def OnSaveReplies(self, e):
-#		try:
+		try:
 			ccmemo = self.textctrl3.GetValue()
 			if not ccmemo: return
 			ccmemo = ccmemo.replace('"', r'\"')
@@ -412,8 +450,8 @@ class GreenMulti(wx.Frame, WebProcess):
 			self.DisplayItems("view")
 			self.textctrl2.SetFocus()
 			self.Play("replies.wav")
-#		except:
-#			self.Play("error.wav")
+		except:
+			self.Play("error.wav")
 
 	def WriteArticle(self):
 		if not ("write_url" in self.ListInfo) or not self.ListInfo["write_url"]: return
@@ -484,34 +522,45 @@ class GreenMulti(wx.Frame, WebProcess):
 			
 
 	def OnTransferStatus(self, e):
-		ts = TransferStatus(self)
-		ts.ShowModal()
-		ts.Destroy()
-
+		try:
+			ts = TransferStatus(self)
+			ts.ShowModal()
+			ts.Destroy()
+		except:
+			pass
 
 	def OnChangeDownFolder(self, e):
 		try:
-			fd = wx.DirDialog(self, '다운로드 폴더 변경', "")
+			fd = wx.DirDialog(self, u'다운로드 폴더 변경', u"")
 			if fd.ShowModal() == wx.ID_OK:
-				self.WriteReg('downfolder', fd.GetPath())
+				fdr = fd.GetPath()
+				if type(fdr) == unicode: fdr = fdr.encode("euc-kr", "ignore")
+				self.WriteReg('downfolder', fdr)
 				self.MsgBox(u"결과", u"다운로드 폴더를 변경했습니다.\n" + self.ReadReg("downfolder"))
 				fd.Destroy()
 		except:
 			pass
 
 	def OnOpenDownFolder(self, e):
-		folder = self.ReadReg("downfolder") if self.ReadReg("downfolder") else "c:\\"
-		subprocess.Popen		("explorer.exe " + folder)
-
+		try:
+			folder = self.ReadReg("downfolder") if self.ReadReg("downfolder") else "c:\\"
+			if type(folder) == unicode: folder = folder.encode("euc-kr", "ignore")
+			subprocess.Popen('explorer.exe "' + folder + '"')
+		except:
+			pass
 
 	def OnComeBackHome(self, e):
-		self.GetInfo(("top", "", "", self.dTreeMenu["top"][2]))
-		self.DisplayItems("menu")
-		self.listctrl.SetFocus()
-		self.Play("back.wav")
+		try:
+			self.GetInfo(("top", "", "", self.dTreeMenu["top"][2]))
+			self.DisplayItems("menu")
+			self.listctrl.SetFocus()
+			self.Play("back.wav")
+		except:
+			pass
 
 	def OnHelp(self, e):
-		msg = """초록멀티 1.5 맛보기 버전 두번째
+		try:
+			msg = """초록멀티 1.5 맛보기 버전 두번째
 제작자 : 장창환
 단축키 안내
 게시판 진입 : Enter
@@ -529,46 +578,54 @@ class GreenMulti(wx.Frame, WebProcess):
 정보 새로고침 : Space 혹은 Enter
 전송 취소 : Delete
 다운로드 폴더 열기: Control + 영문 O
-* 주의 : 이 프로그램은 3월 22일까지 정상동작합니다."""
+* 주의 : 이 프로그램은 3월 말까지 정상동작합니다."""
 
-		self.MsgBox(u"도움말", msg)
+			self.MsgBox(u"도움말", msg)
+		except:
+			pass
 
 	def OnDirectMove(self, e):
-		code = ""
-		dm = DirectMove(self)
-		if dm.ShowModal() == wx.ID_OK:
-			code = dm.combo.GetValue()
-			dm.Destroy()
-		else:
-			dm.Destroy()
-			return
-		if not code or not code in self.dTreeMenu: return
-		r = self.GetInfo((code, "", "", self.dTreeMenu[code][2]))
-		self. DisplayItems(r)
-		self.textctrl1.Clear()
-		self.textctrl2.Clear()
-		self.textctrl3.Clear()
-		self.listctrl.SetFocus()
-		self.Play("code_move.wav")
+		try:
+			code = ""
+			dm = DirectMove(self)
+			if dm.ShowModal() == wx.ID_OK:
+				code = dm.combo.GetValue()
+				dm.Destroy()
+			else:
+				dm.Destroy()
+				return
+			if not code or not code in self.dTreeMenu: return
+			r = self.GetInfo((code, "", "", self.dTreeMenu[code][2]))
+			self. DisplayItems(r)
+			self.textctrl1.Clear()
+			self.textctrl2.Clear()
+			self.textctrl3.Clear()
+			self.listctrl.SetFocus()
+			self.Play("code_move.wav")
+		except:
+			pass
 
 
 	def OnFind(self, e):
-		if not "find_action" in self.ListInfo or not self.ListInfo["find_action"]: return
-		kwd = self.InputBox(u"게시물 검색", u"키워드")
-		if not kwd: return
-		base_url, d = self.ParamSplit(self.ListInfo["find_action"])
-		d["s_ord_r"] = u"번호2".encode("euc-kr", "ignore")
-		d["field_r"] = "all"
-		d["s_que"] = kwd.encode("euc-kr", "ignore")
-		d["page"] = "1"
-		url = base_url + "?" + self.ParamJoin(d, True)
-		r = self.GetInfo(("", "", "", url))
-		self.DisplayItems(r)
-		self.listctrl.SetFocus()
-		self.textctrl1.Clear()
-		self.textctrl2.Clear()
-		self.textctrl3.Clear()
-		self.Play("page_next.wav")
+		try:
+			if not "find_action" in self.ListInfo or not self.ListInfo["find_action"]: return
+			kwd = self.InputBox(u"게시물 검색", u"키워드")
+			if not kwd: return
+			base_url, d = self.ParamSplit(self.ListInfo["find_action"])
+			d["s_ord_r"] = u"번호2".encode("euc-kr", "ignore")
+			d["field_r"] = "all"
+			d["s_que"] = kwd.encode("euc-kr", "ignore")
+			d["page"] = "1"
+			url = base_url + "?" + self.ParamJoin(d, True)
+			r = self.GetInfo(("", "", "", url))
+			self.DisplayItems(r)
+			self.listctrl.SetFocus()
+			self.textctrl1.Clear()
+			self.textctrl2.Clear()
+			self.textctrl3.Clear()
+			self.Play("page_next.wav")
+		except:
+			pass
 
 
 	def WriteMail(self, title, receiver="", retitle="", rebody=""):
@@ -594,21 +651,26 @@ class GreenMulti(wx.Frame, WebProcess):
 
 
 	def OnInitialize(self, e):
-		self.WriteReg("kbuid", "")
-		self.WriteReg("kbupw", "")
-		self.WriteReg("downfolder", "c:\\")
-		self.MsgBox(u"초기화 성공", u"초록멀티의 설정값을 초기화했습니다. 아이디와 비밀번호는 삭제되었고, 다운로드 폴더는 C:\\로 설정되었습니다.")
-
+		try:
+			self.WriteReg("kbuid", "")
+			self.WriteReg("kbupw", "")
+			self.WriteReg("downfolder", "c:\\")
+			self.MsgBox(u"초기화 성공", u"초록멀티의 설정값을 초기화했습니다. 아이디와 비밀번호는 삭제되었고, 다운로드 폴더는 C:\\로 설정되었습니다.")
+		except:
+			pass
 
 	def CheckLimit(self):
-		if not self.dProcess or  len(self.dProcess) < self.limit: 
-			return False
-		else:
-			return True
+		try:
+			if not self.dProcess or  len(self.dProcess) < self.limit: 
+				return False
+			else:
+				return True
+		except:
+				return True
 
 
 if __name__ == "__main__":
 	freeze_support()
 	app = wx.App()
-	f = GreenMulti(u"초록멀티 v1.5 베타4")
+	f = GreenMulti(u"초록멀티 v1.5 RC")
 	app.MainLoop()

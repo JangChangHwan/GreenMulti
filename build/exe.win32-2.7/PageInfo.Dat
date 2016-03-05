@@ -165,3 +165,16 @@ comtol2	2. 문서 강의	comtol	http://web.kbuwel.or.kr/menu/?mo=comtol&club=comto&b
 comtoq	5. 질문과 답변	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtoq
 comtoj	6. 운영 참여	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtoj
 comtor	8. 휴지통	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtor
+
+
+
+pds	10. 공개자료실	top	pdoc|pcomm|pvirus|putil|pdrv|multisoft
+pdoc	1. 문서자료실	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode=pdoc
+pcomm	통신 / 인터넷	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode=pcomm
+pvirus	3. 바이러스 사냥	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode=pdoc
+putil	4. 유틸리티	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode=putil
+pdrv	5. 드라이버	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode=pdrv
+multisoft	6. 멀티미디어 소프트웨어	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode=multisoft
+
+
+

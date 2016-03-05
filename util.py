@@ -171,31 +171,45 @@ class WriteDialog(wx.Dialog):
 		self.Setting()
 
 	def Setting(self):
-		file = self.soup.find("input", type="file")
-		if file is not None: self.btn_attach.Show()
-		title = self.soup.find("input", type="text")
-		if title is not None and title["value"]: self.textctrl1.SetValue(title["value"])
-		body = self.soup.find("textarea")
-		if body is not None and body.get_text(): self.textctrl2.SetValue(body.get_text())
-		form = self.soup.find("form")
-		if form is not None: self.action = form["action"]
+		try:
+			file = self.soup.find("input", type="file")
+			if file is not None: self.btn_attach.Show()
+			title = self.soup.find("input", type="text")
+			if title is not None and title["value"]: self.textctrl1.SetValue(title["value"])
+			body = self.soup.find("textarea")
+			if body is not None and body.get_text(): self.textctrl2.SetValue(body.get_text())
+			form = self.soup.find("form")
+			if form is not None: self.action = form["action"]
+		except:
+			pass
+
 
 	def OnAttach(self, e):
-		if self.attach:
-			self.attach = ""
-			self.btn_attach.SetLabel(u"첨부 파일")
-			return self.MsgBox(u"첨부파일 제거", u"첨부파일 등록을 제거했습니다.")
+		try:
+			if self.attach:
+				self.attach = ""
+				self.btn_attach.SetLabel(u"첨부 파일")
+				return self.MsgBox(u"첨부파일 제거", u"첨부파일 등록을 제거했습니다.")
 
-		fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
-		if fd.ShowModal() == wx.ID_OK:
-			self.attach = fd.GetPath()
-			self.btn_attach.SetLabel(self.attach)
-
+			fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
+			if fd.ShowModal() == wx.ID_OK:
+				filepath = fd.GetPath()
+				euc = filepath if type(filepath) == str else filepath.encode("euc-kr", "ignore")
+				if os.path.exists(euc) and os.path.getsize(euc) < (1024 * 1024 * 1025): 
+					self.attach = filepath
+					self.btn_attach.SetLabel(self.attach)
+				else:
+					self.MsgBox(u"오류", u"파일이 없거나 크기가 1GB를 넘습니다. 1GB가 넘는 파일은 올릴 수 없습니다.")
+		except:
+			pass
 
 	def MsgBox(self, title, text):
-		d = wx.MessageDialog(self, text, title, wx.OK)
-		d.ShowModal()
-		d.Destroy()
+		try:
+			d = wx.MessageDialog(self, text, title, wx.OK)
+			d.ShowModal()
+			d.Destroy()
+		except:
+			pass
 
 
 class TransferStatus(wx.Dialog):
@@ -220,6 +234,12 @@ class TransferStatus(wx.Dialog):
 		self.Destroy()
 
 	def on_listctrl(self, e):
+		try:
+			self.try_on_listctrl(e)
+		except:
+			pass
+
+	def try_on_listctrl(self, e):
 		k = e.GetKeyCode()
 
 		if k == ord(' '):
@@ -242,34 +262,40 @@ class TransferStatus(wx.Dialog):
 
 
 	def cancel(self):
-		n = self.listctrl.GetFocusedItem()
-		if n == -1: return
-		d = wx.MessageDialog(self, u'다운로드를 중단할까요?', u'알림', wx.OK | wx.CANCEL)
-		if d.ShowModal() == wx.ID_OK:
-			p_num = int(self.listctrl.GetItemText(n, 5))
-			try:
-				self.parent.dTransInfo.pop(p_num)
-			except:
-				pass
-			try:
-				pid = self.parent.dProcess.pop(p_num)
-				pid.terminate()
-			except:
-				pass
-			self.get_info()
+		try:
+			n = self.listctrl.GetFocusedItem()
+			if n == -1: return
+			d = wx.MessageDialog(self, u'다운로드를 중단할까요?', u'알림', wx.OK | wx.CANCEL)
+			if d.ShowModal() == wx.ID_OK:
+				p_num = int(self.listctrl.GetItemText(n, 5))
+				try:
+					self.parent.dTransInfo.pop(p_num)
+				except:
+					pass
+				try:
+					pid = self.parent.dProcess.pop(p_num)
+					pid.terminate()
+				except:
+					pass
+				self.get_info()
+		except:
+			pass
 
 
 	def get_info(self):
-		self.listctrl.DeleteAllItems()
-		if not self.parent.dTransInfo: return
-		for k, v in self.parent.dTransInfo.items():
-			index = self.listctrl.InsertStringItem(sys.maxint, "%8.2f%%" % v[0])
-			self.listctrl.SetStringItem(index, 1, v[1])
-			filename = v[2] if type(v[2]) == unicode else unicode(v[2], "euc-kr", "ignore")
-			self.listctrl.SetStringItem(index, 2, filename)
-			self.listctrl.SetStringItem(index, 3, "%8.2fMB" % v[3])
-			self.listctrl.SetStringItem(index, 4, self.remaining(v[4]))
-			self.listctrl.SetStringItem(index, 5, str(k))
+		try:
+			self.listctrl.DeleteAllItems()
+			if not self.parent.dTransInfo: return
+			for k, v in self.parent.dTransInfo.items():
+				index = self.listctrl.InsertStringItem(sys.maxint, "%8.2f%%" % v[0])
+				self.listctrl.SetStringItem(index, 1, v[1])
+				filename = v[2] if type(v[2]) == unicode else unicode(v[2], "euc-kr", "ignore")
+				self.listctrl.SetStringItem(index, 2, filename)
+				self.listctrl.SetStringItem(index, 3, "%8.2fMB" % v[3])
+				self.listctrl.SetStringItem(index, 4, self.remaining(v[4]))
+				self.listctrl.SetStringItem(index, 5, str(k))
+		except:
+			pass
 
 	def remaining(self, t):
 		min = int(t // 60)
@@ -281,7 +307,10 @@ class QueueManager(Thread):
 	def __init__(self, parent):
 		Thread.__init__(self)
 		self.parent = parent
-		self.run()
+		try:
+			self.run()
+		except:
+			pass
 
 	def run(self):
 		while True:
@@ -348,57 +377,83 @@ class WriteMailDialog(wx.Dialog):
 		self.SetAcceleratorTable(accel)
 
 	def OnAttach1(self, e):
-		if self.attach1:
-			self.attach1 = ""
-			self.btn_attach1.SetLabel(u"첨부 파일 #1")
-			return self.MsgBox(u"첨부파일 취소", u"첨부파일 등록을 취소했습니다.")
+		try:
+			if self.attach1:
+				self.attach1 = ""
+				self.btn_attach1.SetLabel(u"첨부 파일 #1")
+				return self.MsgBox(u"첨부파일 취소", u"첨부파일 등록을 취소했습니다.")
 
-		fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
-		if fd.ShowModal() == wx.ID_OK:
-			path = fd.GetPath()
-			if path == self.attach2 or path == self.attach3: return self.MsgBox("경고", "이미 첨부 파일로 지정되어 있습니다. 파일 첨부를 취소합니다.")
-			self.attach1 = path
-			self.btn_attach1.SetLabel(self.attach1)
+			fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
+			if fd.ShowModal() == wx.ID_OK:
+				path = fd.GetPath()
+				if path == self.attach2 or path == self.attach3: return self.MsgBox("경고", "이미 첨부 파일로 지정되어 있습니다. 파일 첨부를 취소합니다.")
+				euc = path if type(path) == str else path.encode("euc-kr", "ignore")
+				if os.path.exists(euc) and os.path.getsize(euc) < (1024 * 1024 * 1025):
+					self.attach1 = path
+					self.btn_attach1.SetLabel(self.attach1)
+				else:
+					self.MsgBox(u"오류", u"파일이 없거나 크기가 1GB를 넘습니다. 1GB가 넘는 파일은 올릴 수 없습니다.")
+		except:
+			pass
+
 
 	def OnAttach2(self, e):
-		if self.attach2:
-			self.attach2 = ""
-			self.btn_attach2.SetLabel(u"첨부 파일 #2")
-			return self.MsgBox(u"첨부파일 취소", u"첨부파일 등록을 취소했습니다.")
+		try:
+			if self.attach2:
+				self.attach2 = ""
+				self.btn_attach2.SetLabel(u"첨부 파일 #2")
+				return self.MsgBox(u"첨부파일 취소", u"첨부파일 등록을 취소했습니다.")
 
-		fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
-		if fd.ShowModal() == wx.ID_OK:
-			path = fd.GetPath()
-			if path == self.attach1 or path == self.attach3: return self.MsgBox("경고", "이미 첨부 파일로 지정되어 있습니다. 파일 첨부를 취소합니다.")
-			self.attach2 = path
-			self.btn_attach2.SetLabel(self.attach2)
+			fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
+			if fd.ShowModal() == wx.ID_OK:
+				path = fd.GetPath()
+				if path == self.attach1 or path == self.attach3: return self.MsgBox("경고", "이미 첨부 파일로 지정되어 있습니다. 파일 첨부를 취소합니다.")
+				euc = path if type(path) == str else path.encode("euc-kr", "ignore")
+				if os.path.exists(euc) and os.path.getsize(euc) < (1024 * 1024 * 1025):
+					self.attach2 = path
+					self.btn_attach2.SetLabel(self.attach2)
+				else:
+					self.MsgBox(u"오류", u"파일이 없거나 크기가 1GB를 넘습니다. 1GB가 넘는 파일은 올릴 수 없습니다.")
+		except:
+			pass
 
 	def OnAttach3(self, e):
-		if self.attach3:
-			self.attach3 = ""
-			self.btn_attach3.SetLabel(u"첨부 파일 #3")
-			return self.MsgBox(u"첨부파일 취소", u"첨부파일 등록을 취소했습니다.")
+		try:
+			if self.attach3:
+				self.attach3 = ""
+				self.btn_attach3.SetLabel(u"첨부 파일 #3")
+				return self.MsgBox(u"첨부파일 취소", u"첨부파일 등록을 취소했습니다.")
 
-		fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
-		if fd.ShowModal() == wx.ID_OK:
-			path = fd.GetPath()
-			if path == self.attach1 or path == self.attach2: return self.MsgBox("경고", "이미 첨부 파일로 지정되어 있습니다. 파일 첨부를 취소합니다.")
-			self.attach3 = path
-			self.btn_attach3.SetLabel(self.attach3)
+			fd = wx.FileDialog(self, u"파일 선택", "", "*.*", u"모든 파일 (*.*)", wx.FD_OPEN)
+			if fd.ShowModal() == wx.ID_OK:
+				path = fd.GetPath()
+				if path == self.attach1 or path == self.attach2: return self.MsgBox("경고", "이미 첨부 파일로 지정되어 있습니다. 파일 첨부를 취소합니다.")
+				euc = path if type(path) == str else path.encode("euc-kr", "ignore")
+				if os.path.exists(euc) and os.path.getsize(euc) < (1024 * 1024 * 1025):
+					self.attach3 = path
+					self.btn_attach3.SetLabel(self.attach3)
+				else:
+					self.MsgBox(u"오류", u"파일이 없거나 크기가 1GB를 넘습니다. 1GB가 넘는 파일은 올릴 수 없습니다.")
+		except:
+			pass
 
 	def MsgBox(self, title, text):
-		d = wx.MessageDialog(self, text, title, wx.OK)
-		d.ShowModal()
-		d.Destroy()
+		try:
+			d = wx.MessageDialog(self, text, title, wx.OK)
+			d.ShowModal()
+			d.Destroy()
+		except:
+			pass
+
 
 class ForUser(Thread):
 	def __init__(self, parent):
 		super(ForUser, self).__init__()
-#		try:
-		self.parent = parent
-		self.run()
-#		except:
-#			return
+		try:
+			self.parent = parent
+			self.run()
+		except:
+			return
 
 	def run(self):
 # 아디 비번 불러오기
@@ -407,7 +462,7 @@ class ForUser(Thread):
 			if not kbuid or not kbupw: return
 
 # 호스트접속
-			tn = telnetlib.Telnet('bbs.kbuwel.or.kr', timeout=10)
+			tn = telnetlib.Telnet('bbs.kbuwel.or.kr', timeout=15)
 			if self.parent.msg == "exit": return
 			tn.read_until(u'아 이 디 :'.encode('euc-kr', 'ignore'), timeout=10)
 			if self.parent.msg == "exit": return
