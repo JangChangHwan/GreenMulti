@@ -158,13 +158,13 @@ comtod9	9. 토렌트	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcod
 comtod10	10. 기타	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod10
 comtod99	11. 전체자료실	comtod	http://web.kbuwel.or.kr/menu/?page=1&club=comto&bcode=comtod99&mo=comtod&&gonum=&s_que=
 
-comtol	5. 강의실	comto	comtol1|comtol2
+comtol	4. 강의실	comto	comtol1|comtol2
 comtol1	1. 음성 / 동영상 강의	comtol	http://web.kbuwel.or.kr/menu/?mo=comtol&club=comto&bcode=comtol1
 comtol2	2. 문서 강의	comtol	http://web.kbuwel.or.kr/menu/?mo=comtol&club=comto&bcode=comtol2
 
 comtoq	5. 질문과 답변	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtoq
 comtoj	6. 운영 참여	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtoj
-comtor	8. 휴지통	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtor
+comtor	7. 휴지통	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtor
 
 
 
