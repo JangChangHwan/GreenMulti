@@ -1,3 +1,4 @@
+top	초기화면		green|guide|mail|bbs|computer|potion|blindnews|magazin|pds|edu2013
 
 guide	1. 공지 및 이용안내	top	notice|oldinfo|rtguide
 notice	1. 공지사항	guide	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=notice&mo=guide&&gonum=&s_que=
@@ -57,7 +58,7 @@ comlec	4. 강좌 / 메뉴얼	computer	mcom|comlecetcb
 mcom	1. 음성 / 동영상 강좌	comlec	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=mcom&mo=comlec&&gonum=&s_que=
 comlecetcb	2. 문서 강좌 / 메뉴얼	comlec	http://web.kbuwel.or.kr/menu/index.php?page=1&club=main&bcode=comlecetcb&mo=comlec&&gonum=&s_que=
 
-prg	5. 개발자와 함께	computer	hims|xvsrd
+prg	5. 개발자와 함께	computer	hims|xvsrd|neo
 
 hims	1. 자원 메디칼(구 힘스인터내셔널)	prg	himsinfo|himsintro|himsproduc|himsfree|himsqna|himsqna2|himsfaq|himsstudy1|himspds1
 himsinfo	1. 공지사항	hims	http://web.kbuwel.or.kr/menu/index.php?page=1&club=hims&bcode=himsinfo&mo=hims&&gonum=&s_que=
@@ -131,6 +132,10 @@ xvpds6	6. 모바일센스자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=mai
 xvpdsall	7. 전체자료실	xvpds	http://web.kbuwel.or.kr/menu/?mo=xvpds&club=main&bcode=xvpdsall
 xvhope	10. Xvision Technology에게 바란다	xvsrd	http://web.kbuwel.or.kr/menu/?mo=xvsrd&club=main&bcode=xvhope
 
+neo	5. (주)네오액세스	prg	neo1|neo3
+neo1	1. 공지사항	neo	http://web.kbuwel.or.kr/menu/?mo=neo&club=neo&bcode=neo1
+neo3	3. 자유롭게 글쓰기	neo	http://web.kbuwel.or.kr/menu/?mo=neo&club=neo&bcode=neo3
+
 skt	6. SK 행복을 들려주는 도서관	computer	skt1|skt2|skt3|skt4
 skt1	1. 공지사항	skt	http://web.kbuwel.or.kr/menu/index.php?page=1&club=skt&bcode=skt1&mo=skt&&gonum=&s_que=
 skt2	2. 묻고 답하기	skt	http://web.kbuwel.or.kr/menu/index.php?page=1&club=skt&bcode=skt2&mo=skt&&gonum=&s_que=
@@ -139,7 +144,23 @@ skt4	4. 행복이벤트 참여 게시판	skt	http://web.kbuwel.or.kr/menu/index.php?page=1
 
 potion	5. 동호회 모음	top	circle|classmate|religion
 
-circle	1. 일반 동호회	potion	comto
+circle	1. 일반 동호회	potion	saju|comto
+
+saju	12. 미래예측학 동호회	circle	saju1|saju2|saju3|saju4|saju5|saju6|saju9
+
+saju1	1. 공지사항	saju	http://web.kbuwel.or.kr/menu/?mo=saju&club=saju&bcode=saju1
+saju2	2. 게시판	saju	http://web.kbuwel.or.kr/menu/?mo=saju&club=saju&bcode=saju2
+saju3	3. 나의 경험담	saju	http://web.kbuwel.or.kr/menu/?mo=saju&club=saju&bcode=saju3
+saju4	4. 무엇이든 물어 보세요	saju	http://web.kbuwel.or.kr/menu/?mo=saju&club=saju&bcode=saju4
+
+saju5	5. 자료실	saju	saju51|saju52|saju53
+saju51	1. 문서 자료실	saju5	http://web.kbuwel.or.kr/menu/?mo=saju5&club=saju&bcode=saju51
+saju52	2. 프로그램 자료실	saju5	http://web.kbuwel.or.kr/menu/?mo=saju5&club=saju&bcode=saju52
+saju53	3. 기타 자료실	saju5	http://web.kbuwel.or.kr/menu/?mo=saju5&club=saju&bcode=saju53
+
+saju6	6. 동양예측학 강좌	saju	http://web.kbuwel.or.kr/menu/?mo=saju&club=saju&bcode=saju6
+saju9	7. 서양예측학 강좌	saju	http://web.kbuwel.or.kr/menu/?mo=saju&club=saju&bcode=saju9
+
 
 comto	43. 컴토피아	circle	comton|comtof|comtod|comtol|comtoq|comtoj|comtor
 comton	1. 공지사항	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comton
@@ -151,20 +172,20 @@ comtod2	2. 드라이버	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bc
 comtod3	3. 스크린리더 / 점자 / TTS	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod3
 comtod4	4. 문서 / 오피스	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod4
 comtod5	5. 유틸리티	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod5
-comtod6	6. 유틸리티	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod6
+comtod6	6. 멀티미디어	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod6
 comtod7	7. 백업 / 복구	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod7
 comtod8	8. 포터블	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod8
 comtod9	9. 토렌트	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod9
 comtod10	10. 기타	comtod	http://web.kbuwel.or.kr/menu/?mo=comtod&club=comto&bcode=comtod10
 comtod99	11. 전체자료실	comtod	http://web.kbuwel.or.kr/menu/?page=1&club=comto&bcode=comtod99&mo=comtod&&gonum=&s_que=
 
-comtol	5. 강의실	comto	comtol1|comtol2
+comtol	4. 강의실	comto	comtol1|comtol2
 comtol1	1. 음성 / 동영상 강의	comtol	http://web.kbuwel.or.kr/menu/?mo=comtol&club=comto&bcode=comtol1
 comtol2	2. 문서 강의	comtol	http://web.kbuwel.or.kr/menu/?mo=comtol&club=comto&bcode=comtol2
 
 comtoq	5. 질문과 답변	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtoq
 comtoj	6. 운영 참여	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtoj
-comtor	8. 휴지통	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtor
+comtor	7. 휴지통	comto	http://web.kbuwel.or.kr/menu/?mo=comto&club=comto&bcode=comtor
 
 
 
@@ -175,6 +196,7 @@ pvirus	3. 바이러스 사냥	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode
 putil	4. 유틸리티	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode=putil
 pdrv	5. 드라이버	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode=pdrv
 multisoft	6. 멀티미디어 소프트웨어	pds	http://web.kbuwel.or.kr/menu/?mo=pds&club=main&bcode=multisoft
+
 
 
 

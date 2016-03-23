@@ -11,6 +11,8 @@ import wx
 from threading import Thread
 import time
 import telnetlib
+import zipfile
+from bs4 import BeautifulSoup as bs
 
 
 class Utility():
@@ -488,3 +490,255 @@ class ForUser(Thread):
 				text = tn.read_very_eager()
 				tn.write('green3\n')
 				t = 0
+
+
+class Library(wx.Dialog):
+	def __init__(self, parent):
+		wx.Dialog.__init__(self, parent, -1, u"아이프리 전자도서관", wx.DefaultPosition, wx.Size(450, 300))
+		self.parent = parent
+		self.href = []
+		self.list_url = ""
+
+		lbl1 = wx.StaticText(self, -1, u"분류", (10, 10), (100, 20))
+		choiceList = [u"1. 총류", u"2. 철학", u"3. 종교", u"4. 사회과학", u"5. 순수과학", u"6. 기술과학", u"7. 예술", u"8. 어학", u"9. 문학 - 1. 환타지, SF소설", u"9. 문학 - 2. 무협", u"9. 문학 - 3. 추리, 공포, 꽁트", u"9. 문학 - 4. 일반소설", u"9. 문학 - 5. 소설 외 문학", u"9. 문학 - 6. 아동문학", u"10. 역사", u"20. 전체자료실"]
+		self.booklist = ("http://eyefree.org/board/board.php?bdname=bd_main_book1&backurl=/book.php&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book3&backurl=/book.php&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book2&backurl=/book.php&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book4&backurl=/book.php&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book5&backurl=/book.php&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book6&backurl=/book.php&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book7&backurl=/book.php&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book8&backurl=/book.php&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book91&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book92&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book93&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book94&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book95&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book96&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_book10&backurl=/book.php&page=1", "http://eyefree.org/board/board.php?bdname=bd_main_ball&backurl=/book.php&page=1")
+		self.choice = wx.ListBox(self, -1, (120, 10), (320, 20), choiceList, wx.LB_SINGLE)
+		self.choice.Bind(wx.EVT_LISTBOX, self.OnChoice)
+		self.choice.Bind(wx.EVT_KEY_DOWN, self.OnChoiceKeyDown)
+
+		self.listbox = wx.ListBox(self, -1, (10, 40), (430, 250), [], wx.LB_SINGLE)
+		self.listbox.Bind(wx.EVT_KEY_DOWN, self.OnListBox)
+
+		# 아이프리 로그인
+		self.parent.Get("http://eyefree.org/book.php")
+		m = self.parent.soup.find('a', href=re.compile(r"(?i)/login.php"))
+		if m is not None: self.SilLogin()
+
+
+	def SilLogin(self):
+		try:
+			silid = self.parent.Decrypt(self.parent.ReadReg('silid'))
+			if not silid: silid = self.InputBox(u'아이프리 로그인', u'아이디')
+
+			silpw = self.parent.Decrypt(self.parent.ReadReg('silpw'))
+			if not silpw: silpw = self.InputBox(u'아이프리 로그인', u'비밀번호', pwd=1) 
+			if not silid or not silpw: return self.msgbox(u'알림', u'사용자 아이디와 비밀번호는 필수 입력사항입니다.')
+
+			params = {"uid":silid, "upw":silpw}
+			self.parent.Post("http://eyefree.org/member/loginchk.php", params)
+
+			if "../index.php" in self.parent.soup.get_text():
+				self.parent.WriteReg('silid', self.parent.Encrypt(silid))
+				self.parent.WriteReg('silpw', self.parent.Encrypt(silpw))
+			else:
+				self.parent.WriteReg('silid', '')
+				self.parent.WriteReg('silpw', '')
+				return self.MsgBox(u'알림', u'아이프리 로그인에 실패했습니다.')
+
+		except:
+			pass
+
+
+
+	def InputBox(self, title, text, pwd=False):
+		try:
+			style = wx.OK | wx.CANCEL | wx.TE_PASSWORD if pwd else wx.OK | wx.CANCEL
+			entry = wx.TextEntryDialog(self, text, title, '', style)
+			if entry.ShowModal() == wx.ID_OK: return entry.GetValue()
+			entry.Destroy()
+		except:
+			pass
+
+	def MsgBox(self, title, text, question=False):
+		try:
+			if question:
+				d = wx.MessageDialog(self, text, title, wx.OK | wx.CANCEL)
+				if d.ShowModal() == wx.ID_OK:
+					return True
+				else:
+					return False
+				d.Destroy()
+			else:
+				d = wx.MessageDialog(self, text, title, wx.OK)
+				d.ShowModal()
+				d.Destroy()
+		except:
+			pass
+
+
+	def DaisyToText(self, path):
+		try:
+			zfile = zipfile.ZipFile(path, "r")
+			for filename in zfile.namelist():
+				if not filename.endswith(".xml"): continue
+				xml = zfile.read(filename)
+				zfile.close()
+				break
+
+			xml = re.sub(r"(?ims)<pagenum [^<>]+>\d+</pagenum>", "",  xml)
+			soup = bs(xml, "html.parser")
+			text = soup.book.get_text()
+			text = text.replace(u"\n", u"\r\n")
+			text = text.encode("utf-16", "ignore")
+			textfile = path[:-4] + ".txt"
+			f = open(textfile, "wb")
+			f.write(text)
+			f.close()
+			os.remove(path)
+		except:
+			self.parent.Play("error.wav")
+
+
+	def OnChoiceKeyDown(self, e):
+		k = e.GetKeyCode()
+		if e.GetModifiers() == wx.MOD_CONTROL and k == ord("O"):
+			self.parent.OnOpenDownFolder(e)
+
+		elif k == wx.WXK_ESCAPE:
+			self.Destroy()
+
+		elif e.GetModifiers() == wx.MOD_CONTROL and k == ord("F"):
+			self.Search()
+
+
+		else:
+			e.Skip()
+
+
+	def OnChoice(self, e):
+		try:
+			n = self.choice.GetSelection()
+			if n == -1: return
+			self.list_url = self.booklist[n]
+			self.parent.Get(self.list_url)
+			self.GetList()
+			self.parent.Play("page_next.wav")
+		except:
+			pass
+
+	def GetList(self):
+		self.href = []
+		self.listbox.Clear()
+		links = self.parent.soup('a', href=re.compile(r"(?i)board_view.php"))
+		if links is None: return
+		for l in links:
+			self.listbox.Append(l.get_text())
+			self.href.append("http://eyefree.org/board/" + l["href"])
+
+	def OnListBox(self, e):
+		try:
+			self.try_OnListBox(e)
+		except:
+			pass
+
+	def try_OnListBox(self, e):
+		k = e.GetKeyCode()
+		if k == ord(" "): # 스페이스바 누를 때
+			n = self.listbox.GetSelection()
+			if n == -1: return
+			self.parent.Get(self.href[n])
+			bookinfo = self.parent.soup.find("article", attrs={"class":"bbs_view"})
+			if bookinfo is None: return
+			self.MsgBox(u"도서 정보", bookinfo.get_text())
+
+		elif k == ord("D"):
+			n = self.listbox.GetSelection()
+			if n == -1: return
+			self.parent.Get(self.href[n])
+			filelink = self.parent.soup.find("a", href=re.compile(r"(?i)download.php"))
+			if filelink is None: return
+			filename = filelink.get_text()[7:]
+			res = self.parent.opener.open("http://eyefree.org/board/" + filelink["href"])
+			file = res.read()
+
+			downfolder = self.parent.ReadReg("downfolder")
+			if not downfolder: downfolder = "c:\\"
+			path = downfolder + "\\" + filename
+			path = path.replace("\\\\", "\\")
+
+			if type(path) == unicode: path = path.encode("euc-kr", "ignore")
+			f = open(path, "wb")
+			f.write(file)
+			f.close()
+
+			if self.parent.limit == 100: self.DaisyToText(path)
+			self.parent.Play("down.wav")
+
+		elif e.GetModifiers() == wx.MOD_CONTROL and k == ord("O"):
+			self.parent.OnOpenDownFolder(e)
+
+		elif k == wx.WXK_PAGEDOWN:
+			url, data = self.parent.ParamSplit(self.list_url)
+			n = int(data["page"])
+			data["page"] = str(n+1)
+			self.list_url = url + "?" + self.parent.ParamJoin(data, enc=False)
+			self.parent.Get(self.list_url)
+			self.GetList()
+			if len(self.href) > 0: 
+				self.parent.Play("page_next.wav")
+			else:
+				data["page"] = str(n)
+				self.list_url = url + "?" + self.parent.ParamJoin(data, enc=False)
+				self.parent.Get(self.list_url)
+				self.GetList()
+				self.parent.Play("beep.wav")
+
+
+
+		elif k == wx.WXK_PAGEUP:
+			url, data = self.parent.ParamSplit(self.list_url)
+			n = int(data["page"])
+			if n <= 1: return self.parent.Play("beep.wav")
+			data["page"] = str(n - 1)
+			self.list_url = url + "?" + self.parent.ParamJoin(data, enc=False)
+			self.parent.Get(self.list_url)
+			self.GetList()
+			self.parent.Play("page_prev.wav")
+
+			self.list_
+
+
+		elif k == wx.WXK_UP:
+			if self.listbox.GetSelection() <= 0: 				self.parent.Play("beep.wav")
+			e.Skip()
+
+		elif k == wx.WXK_DOWN:
+			if self.listbox.GetSelection() == len(self.href) - 1: 				self.parent.Play("beep.wav")
+			e.Skip()
+
+		elif k == wx.WXK_ESCAPE:
+			self.Destroy()
+
+		elif e.GetModifiers() == wx.MOD_CONTROL and k == ord("F"):
+			self.Search()
+
+		else:
+			e.Skip()
+
+
+	def Search(self):
+		try:
+			# 검색 폼이 있는가?
+			form = self.parent.soup.find("form", attrs={"name":"frm_srch"})
+			if form is None: return
+			# 여러 값을 가져옵니다.
+			action = "http://eyefree.org/board/" + form["action"]
+			url, data = self.parent.ParamSplit(action)
+			hiddens = self.parent.soup("input", type="hidden")
+			if hiddens is None: return
+			for h in hiddens:
+				data[h["name"]] = h["value"]
+
+			kwd = self.InputBox(u"도서 검색", u"키워드")
+			if not kwd: return
+			if type(kwd) == unicode: kwd = kwd.encode("euc-kr", "ignore")
+			data["term1"] = kwd
+			data["page"] = 1
+			self.list_url = url + "?" + self.parent.ParamJoin(data)
+			self.parent.Get(self.list_url)
+			self.GetList()
+			self.listbox.SetFocus()
+			self.parent.Play("page_next.wav")
+		except:
+			pass
+

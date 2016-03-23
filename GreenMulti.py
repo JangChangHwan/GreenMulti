@@ -13,6 +13,9 @@ from threading import Thread
 import time
 import subprocess
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 class GreenMulti(wx.Frame, WebProcess):
 	def __init__(self, title):
@@ -37,6 +40,9 @@ class GreenMulti(wx.Frame, WebProcess):
 		help_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"도움말\tF1")
 		file_menu.AppendItem(help_mi)
 		self.Bind(wx.EVT_MENU, self.OnHelp, help_mi)
+		lib_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"아이프리 전자도서관\tCtrl+L")
+		file_menu.AppendItem(lib_mi)
+		self.Bind(wx.EVT_MENU, self.OnLibrary, lib_mi)
 		home_mi = wx.MenuItem(file_menu, wx.ID_ANY, u"홈으로 이동\tAlt+Home")
 		file_menu.AppendItem(home_mi)
 		self.Bind(wx.EVT_MENU, self.OnComeBackHome, home_mi)
@@ -333,6 +339,7 @@ class GreenMulti(wx.Frame, WebProcess):
 				d.Destroy()
 		except:
 			pass
+
 	def OnTextCtrl1KeyDown(self, e):
 		try:
 			self.try_OnTextCtrl1KeyDown(e)
@@ -707,10 +714,14 @@ class GreenMulti(wx.Frame, WebProcess):
 		if self.MsgBox(u"가입 신청", u"정보 입력을 마쳤습니다. 초록등대에 가입 신청을 할까요?", True) == True:
 			self.Post(url, data)
 
+	def OnLibrary(self, e):
+		lib = Library(self)
+		lib.ShowModal()
+		lib.Destroy()
 
 
 if __name__ == "__main__":
 	freeze_support()
 	app = wx.App()
-	f = GreenMulti(u"초록멀티 v1.5")
+	f = GreenMulti(u"초록멀티 v1.6")
 	app.MainLoop()
