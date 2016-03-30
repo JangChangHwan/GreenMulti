@@ -12,10 +12,12 @@ import sys
 import winsound
 import time
 import mmap
+import json
 
 
 class WebProcess(Utility):
 	def __init__(self):
+		Utility.__init__(self)
 		self.dTreeMenu = self.TreeMenuFromFile()
 		self.bcode = "top"
 		self.lItemList = [("top", "제목", "", self.dTreeMenu["top"][2])]
@@ -268,6 +270,9 @@ class WebProcess(Utility):
 		self.Post(self.ViewInfo["action"], self.ViewInfo["data"])
 		self.GetInfo(("", "", "", self.ViewInfo["url"]))
 		return True
+
+
+
 
 
 class Upload(Process, WebProcess):

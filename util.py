@@ -48,7 +48,7 @@ class Utility():
 			"green66": (u"6. 기타자료실".encode("euc-kr", "ignore"), "green6", "http://web.kbuwel.or.kr/menu/index.php?mo=green6&club=green&bcode=green66"),
 			"green67": (u"7. 토렌트 파일".encode("euc-kr", "ignore"), "green6", "http://web.kbuwel.or.kr/menu/index.php?mo=green6&club=green&bcode=green67"),
 			"green699": (u"8. 요청게시판".encode("euc-kr", "ignore"), "green6", "http://web.kbuwel.or.kr/menu/index.php?mo=green6&club=green&bcode=green699"),
-			"green7": (u"7. 스카이프 친구등록".encode("euc-kr", "ignore"), "green", "http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green7"), 
+			"green7": (u"7. Youtube".encode("euc-kr", "ignore"), "green", "http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green7"), 
 			"green8": (u"8. 건의함".encode("euc-kr", "ignore"), "green", "http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green8"), 
 			"green9": (u"9. 질문게시판".encode("euc-kr", "ignore"), "green", "http://web.kbuwel.or.kr/menu/index.php?mo=green&club=green&bcode=green9"), 
 			"green99": (u"10. 회원가입".encode("euc-kr", "ignore"), "green", "http://web.kbuwel.or.kr/menu/index.php?cmd=club_join&mo=green&club=green&bcode=green99")

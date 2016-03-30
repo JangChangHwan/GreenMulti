@@ -2,6 +2,7 @@
 # 메인 프로그램
 
 import sys
+from youtube import *
 from util import *
 from web import *
 import winsound
@@ -12,9 +13,6 @@ from multiprocessing import Process, Queue, freeze_support
 from threading import Thread
 import time
 import subprocess
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 
 class GreenMulti(wx.Frame, WebProcess):
@@ -185,6 +183,7 @@ class GreenMulti(wx.Frame, WebProcess):
 		except:
 			pass
 
+
 	def try_listctrl_KeyDown(self, e):
 		k = e.GetKeyCode()
 
@@ -306,10 +305,27 @@ class GreenMulti(wx.Frame, WebProcess):
 			self.DisplayItems("list")
 			self.Play("refresh.wav")
 
-		elif k == wx.WXK_F2:
+
+		elif k == ord("4"):
 			n = self.listctrl.GetFocusedItem()
-			if n == -1: return
-			self.MsgBox("", self.lItemList[n][3])
+			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
+			url = self.lItemList[n][3]
+			if type(url) == unicode: url = url.encode("euc-kr", "ignore")
+			res = self.opener.open(url)
+			html = unicode(res.read(), "euc-kr", "ignore")
+			soup = bs(html, "html.parser")
+			self.Youtube(0, soup)
+
+
+		elif k == ord("3"):
+			n = self.listctrl.GetFocusedItem()
+			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
+			url = self.lItemList[n][3]
+			if type(url) == unicode: url = url.encode("euc-kr", "ignore")
+			res = self.opener.open(url)
+			html = unicode(res.read(), "euc-kr", "ignore")
+			soup = bs(html, "html.parser")
+			self.Youtube(1, soup)
 
 		else:
 			e.Skip()
@@ -339,12 +355,12 @@ class GreenMulti(wx.Frame, WebProcess):
 				d.Destroy()
 		except:
 			pass
-
 	def OnTextCtrl1KeyDown(self, e):
 		try:
 			self.try_OnTextCtrl1KeyDown(e)
 		except:
 			pass
+
 
 	def try_OnTextCtrl1KeyDown(self, e):
 		k = e.GetKeyCode()
@@ -374,8 +390,16 @@ class GreenMulti(wx.Frame, WebProcess):
 			if not ("files" in self.ViewInfo) or not self.ViewInfo["files"]: return
 			self.Download(self.ViewInfo["files"])
 
+		elif k == ord("3"):
+			self.Youtube(1, self.soup)
+
+		elif k == ord("4"):
+			self.Youtube(0, self.soup)
+
 		else:
 			e.Skip()
+
+
 	def OnTextCtrl2KeyDown(self, e):
 		try:
 			self.try_OnTextCtrl2KeyDown(e)
@@ -573,7 +597,7 @@ class GreenMulti(wx.Frame, WebProcess):
 
 	def OnHelp(self, e):
 		try:
-			msg = u"""초록멀티 1.5
+			msg = u"""초록멀티
 제작자 : 장창환
 이메일 : 462356@gmail.com
 *** 단축키 안내 ***
@@ -720,8 +744,20 @@ class GreenMulti(wx.Frame, WebProcess):
 		lib.Destroy()
 
 
+
+	def Youtube(self, mode, soup):
+		text = soup.get_text()
+		l = re.findall(r"(?i)\[(https://www.youtube.com/[^\[\]]+)\]", text)
+		if not l: return
+		for url in l:
+			self.p_num += 1
+			p = Process(target=YoutubeDownloader, args=(url, mode, self.p_num, self.ResQ))
+			p.start()
+			self.dProcess[self.p_num] = p
+
+
 if __name__ == "__main__":
 	freeze_support()
 	app = wx.App()
-	f = GreenMulti(u"초록멀티 v1.6")
+	f = GreenMulti(u"초록멀티 v1.7")
 	app.MainLoop()
