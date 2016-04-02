@@ -307,6 +307,7 @@ class GreenMulti(wx.Frame, WebProcess):
 
 
 		elif k == ord("4"):
+			e.Skip()
 			n = self.listctrl.GetFocusedItem()
 			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
 			url = self.lItemList[n][3]
@@ -318,6 +319,7 @@ class GreenMulti(wx.Frame, WebProcess):
 
 
 		elif k == ord("3"):
+			e.Skip()
 			n = self.listctrl.GetFocusedItem()
 			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
 			url = self.lItemList[n][3]
@@ -644,14 +646,17 @@ class GreenMulti(wx.Frame, WebProcess):
 
 
 	def OnFind(self, e):
-		try:
+#		try:
 			if not "find_action" in self.ListInfo or not self.ListInfo["find_action"]: return
+			find_url = self.ListInfo["find_action"]
+			if type(find_url) == unicode: find_url = find_url.encode("euc-kr", "ignore")
 			kwd = self.InputBox(u"게시물 검색", u"키워드")
 			if not kwd: return
-			base_url, d = self.ParamSplit(self.ListInfo["find_action"])
+			if type(kwd) == unicode: kwd = kwd.encode("euc-kr", "ignore")
+			base_url, d = self.ParamSplit(find_url)
 			d["s_ord_r"] = u"번호2".encode("euc-kr", "ignore")
 			d["field_r"] = "all"
-			d["s_que"] = kwd.encode("euc-kr", "ignore")
+			d["s_que"] = kwd
 			d["page"] = "1"
 			url = base_url + "?" + self.ParamJoin(d, True)
 			r = self.GetInfo(("", "", "", url))
@@ -661,8 +666,8 @@ class GreenMulti(wx.Frame, WebProcess):
 			self.textctrl2.Clear()
 			self.textctrl3.Clear()
 			self.Play("page_next.wav")
-		except:
-			pass
+#		except:
+#			pass
 
 
 	def WriteMail(self, title, receiver="", retitle="", rebody=""):
@@ -759,5 +764,5 @@ class GreenMulti(wx.Frame, WebProcess):
 if __name__ == "__main__":
 	freeze_support()
 	app = wx.App()
-	f = GreenMulti(u"초록멀티 v1.7")
+	f = GreenMulti(u"초록멀티 v1.7.3")
 	app.MainLoop()

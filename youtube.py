@@ -39,7 +39,15 @@ class YoutubeDownloader(Process, Utility):
 				time.sleep(1)
 
 	def prepare(self):
-		r = self.opener.open(self.url)
+		host, params = self.ParamSplit(self.url)
+		if "v" in params:
+			url = host + "?v=" + params["v"]
+		elif "V" in params:
+			url = host + "?v=" + params["V"]
+		else:
+			url = self.url
+
+		r = self.opener.open(url)
 		html = r.read()
 		m = re.search('(?ims)"url_encoded_fmt_stream_map"\s*:\s*"([^"]+)",', html)
 		if m is None: return False
