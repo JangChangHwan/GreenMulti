@@ -329,6 +329,19 @@ class GreenMulti(wx.Frame, WebProcess):
 			soup = bs(html, "html.parser")
 			self.Youtube(1, soup)
 
+		# 유튜브 홈페이지 열기
+#		elif e.GetModifiers() == wx.MOD_CONTROL and k == wx.WXK_RETURN:
+		elif k == ord("Y") or k == ord("y"):
+			n = self.listctrl.GetFocusedItem()
+			if n == -1 or not ("cmd=view" in self.lItemList[n][3]): return 
+			url = self.lItemList[n][3]
+			if type(url) == unicode: url = url.encode("euc-kr", "ignore")
+			res = self.opener.open(url)
+			html = unicode(res.read(), "euc-kr", "ignore")
+			soup = bs(html, "html.parser")
+			self.RunYoutube(soup)
+
+
 		else:
 			e.Skip()
 
@@ -357,6 +370,7 @@ class GreenMulti(wx.Frame, WebProcess):
 				d.Destroy()
 		except:
 			pass
+
 	def OnTextCtrl1KeyDown(self, e):
 		try:
 			self.try_OnTextCtrl1KeyDown(e)
@@ -397,6 +411,9 @@ class GreenMulti(wx.Frame, WebProcess):
 
 		elif k == ord("4"):
 			self.Youtube(0, self.soup)
+
+		elif k == ord("Y") or k == ord("y"):
+			self.RunYoutube(self.soup)
 
 		else:
 			e.Skip()
@@ -510,8 +527,9 @@ class GreenMulti(wx.Frame, WebProcess):
 			if not title or not body: return self.MsgBox(u"오류", u"게시물 제목과 본문 내용은 필수 입력사항입니다. 게시물을 올릴 수 없습니다.")
 			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.p_num, self.ResQ))
 			p.start()
-			if file: 
-				self.dProcess[self.p_num] = p
+			self.dProcess[self.p_num] = p
+
+
 
 		else:
 			wd.Destroy()
@@ -529,8 +547,10 @@ class GreenMulti(wx.Frame, WebProcess):
 			file = wd.attach
 			wd.Destroy()
 			if not title or not body: return self.MsgBox(u"오류", u"게시물 제목과 본문 내용은 필수 입력사항입니다. 게시물을 올릴 수 없습니다.")
+			self.p_num += 1
 			p = Process(target=Upload, args=(self.ListInfo["host"] + action, title, body, file, self.p_num, self.ResQ))
 			p.start()
+			self.dProcess[self.p_num] = p
 		else:
 			wd.Destroy()
 
@@ -605,7 +625,7 @@ class GreenMulti(wx.Frame, WebProcess):
 *** 단축키 안내 ***
 게시판 진입 : Enter 
 되돌아 나오기 : Escape도 되고, BackSpace도 되고, Alt + LeftArrow 중 편할 걸로 사용하세요.
-컨트롤 간의 이동: Tab 
+컨트롤 간의 이동: 탭키 또는 쉬프트 탭
 홈으로 이동 : Alt + Home
 다음 페이지 : Page Down / 이전 페이지 Page Up
 게시물 쓰기 : 영문 W / 게시물 수정하기 : 영문 E
@@ -617,7 +637,11 @@ class GreenMulti(wx.Frame, WebProcess):
 파일 정보 보기 대화상자에서의 단축키
 정보 새로고침 : Space  
 전송 프로세스 갯수 보기 : Enter
-전송 취소 : Delete """
+전송 취소 : Delete 
+*** 유튜브 단축키 ***
+MP3 음악으로 다운로드 : 숫자 3
+MP4 동영상 다운로드 : 숫자 4
+유튜브 재생 페이지 열기 : 영문 Y"""
 
 			self.MsgBox(u"도움말", msg)
 		except:
@@ -685,8 +709,7 @@ class GreenMulti(wx.Frame, WebProcess):
 			self.p_num += 1
 			p = Process(target=SendMail, args=(receiver, coreceiver, title, body, file1, file2, file3, self.p_num, self.ResQ))
 			p.start()
-			if file1 or file2 or file3: 
-				self.dProcess[self.p_num] = p
+			self.dProcess[self.p_num] = p
 
 		else:
 			wd.Destroy()
@@ -754,15 +777,22 @@ class GreenMulti(wx.Frame, WebProcess):
 		text = soup.get_text()
 		l = re.findall(r"(?i)\[(https://www.youtube.com/[^\[\]]+)\]", text)
 		if not l: return
-		for url in l:
-			self.p_num += 1
-			p = Process(target=YoutubeDownloader, args=(url, mode, self.p_num, self.ResQ))
-			p.start()
-			self.dProcess[self.p_num] = p
+		url = l[0]
+		self.p_num += 1
+		p = Process(target=YoutubeDownloader, args=(url, mode, self.p_num, self.ResQ))
+		p.start()
+		self.dProcess[self.p_num] = p
 
+
+	def RunYoutube(self, soup):
+		text = soup.get_text()
+		l = re.findall(r"(?i)\[(https://www.youtube.com/[^\[\]]+)\]", text)
+		if not l: return
+		url = l[0]
+		subprocess.Popen('C:\\Program Files\\Internet Explorer\\iexplore.exe ' + url)
 
 if __name__ == "__main__":
 	freeze_support()
 	app = wx.App()
-	f = GreenMulti(u"초록멀티 v1.7.3")
+	f = GreenMulti(u"초록멀티 v1.7.5")
 	app.MainLoop()

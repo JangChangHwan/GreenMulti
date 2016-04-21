@@ -293,11 +293,12 @@ class Upload(Process, WebProcess):
 			if not self.KbuLogin(): return
 			self.run()
 		except:
-			pass
+			self.Play("error.wav", async=False)
+		finally:
+			self.q.put((100, u"업로드 완료", "", 0, 0, self.p_num))
+			while True:
+				time.sleep(1)
 
-
-#		except:
-#			self.Play("error.wav", async=False)
 
 	def KbuLogin(self):
 		try:
@@ -323,7 +324,7 @@ class Upload(Process, WebProcess):
 		if file: self.q.put((0, u"업로드 중", file, 0, 0, self.p_num))
 		self.Post(host, data)
 		self.Play("up.wav", async=False)
-		if file: self.q.put((100, u"업로드 완료", file, 0, 0, self.p_num))
+		self.q.put((100, u"업로드 완료", file, 0, 0, self.p_num))
 		while True:
 			time.sleep(1)
 
@@ -430,6 +431,11 @@ class SendMail(Process, WebProcess):
 			self.run()
 		except:
 			self.Play("error.wav", async=False)
+		finally:
+			self.q.put((100, u"업로드 완료", "", 0, 0, self.p_num))
+			while True:
+				time.sleep(1)
+
 
 	def KbuLogin(self):
 		try:
@@ -461,6 +467,6 @@ class SendMail(Process, WebProcess):
 		if file: self.q.put((0, u"업로드 중", file, 0, 0, self.p_num))
 		self.Post(host, data)
 		self.Play("up.wav", async=False)
-		if file: self.q.put((100, u"업로드 완료", file, 0, 0, self.p_num))
+		self.q.put((100, u"업로드 완료", file, 0, 0, self.p_num))
 		while True:
 			time.sleep(1)
